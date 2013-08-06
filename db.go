@@ -51,6 +51,7 @@ func(serv GraphService) GetNodeHandler(Id int) (n Node){
 	n.Name = "Some Node"
 	n.ExtraJSONBytes = []byte(`[{"Name": "Platypus", "Order": "Monotremata"}]`)
 	
+	// this technique of taking arbitrary JSON and turning it into something usable came from: http://blog.golang.org/json-and-go
 	var tmp interface {}
 	err := json.Unmarshal(n.ExtraJSONBytes, &tmp)
 	if err != nil {
