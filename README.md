@@ -1,6 +1,12 @@
 # simple graph database
 
+Version: 0.1
+
 This is supposed to be just a very simple graph database, accessible via a REST interface.
+
+## warning
+
+This is still in very, very early development. It's not really usable yet in any substantial way.
 
 ## ideas / lists
 
