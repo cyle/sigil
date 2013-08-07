@@ -39,17 +39,17 @@ func main() {
 	fmt.Println("Oh dear, a graph database...")
 	
 	// create some dummy nodes!
-	for i := 0; i < 10; i++ {
+	for i := 1; i <= 10; i++ {
 		tmpNode := Node{ i, "Node "+fmt.Sprintf("%d", i), nil, nil }
 		theData.nodes = append(theData.nodes, tmpNode)
 	}
 	
 	// create some dummy connections!
-	connOne := Connection{ 0, "Node 1 to 2", 1, 2 }
-	connTwo := Connection{ 1, "Node 2 to 4", 2, 4 }
-	connThree := Connection{ 2, "Node 4 to 5", 4, 5 }
-	connFour := Connection{ 3, "Node 2 to 3", 2, 3 }
-	connFive := Connection{ 4, "Node 3 to 5", 3, 5 }
+	connOne := Connection{ 1, "Node 1 to 2", 1, 2 }
+	connTwo := Connection{ 2, "Node 2 to 4", 2, 4 }
+	connThree := Connection{ 3, "Node 4 to 5", 4, 5 }
+	connFour := Connection{ 4, "Node 2 to 3", 2, 3 }
+	connFive := Connection{ 5, "Node 3 to 5", 3, 5 }
 	// add connections to the big data pool
 	theData.connections = append(theData.connections, connOne, connTwo, connThree, connFour, connFive)
 	
@@ -143,7 +143,7 @@ func (serv GraphService) PostNodeHandler(n Node) {
 	}
 	// doesn't exist? create it.
 	fmt.Println("Creating new node based on input")
-	n.Id = len(theData.nodes)
+	n.Id = len(theData.nodes) + 1 // +1 because it's 1-based instead of 0-based
 	theData.nodes = append(theData.nodes, n)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
@@ -257,7 +257,8 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 		}
 	}
 	// does not exist! create a new connection.
-	c.Id = len(theData.connections)
+	fmt.Println("Creating new connection based on input")
+	c.Id = len(theData.connections) + 1 // +1 because it's 1-based instead of 0-based
 	theData.connections = append(theData.connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
