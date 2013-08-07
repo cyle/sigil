@@ -74,6 +74,7 @@ type GraphService struct{
 	getNodeHandler gorest.EndPoint `method:"GET" path:"/node/{Id:int}" output:"Node"`
 	postNodeHandler gorest.EndPoint `method:"POST" path:"/node" postdata:"Node"`
 	deleteNodeHandler gorest.EndPoint `method:"DELETE" path:"/node/{Id:int}"`
+	getConnectionsForNodeHandler gorest.EndPoint `method:"GET" path:"/node/{Id:int}/connections" output:"[]Connection"`
 	
 	// connections stuff
 	getConnectionsHandler gorest.EndPoint `method:"GET" path:"/connections" output:"[]Connection"`
@@ -177,6 +178,26 @@ func (serv GraphService) DeleteNodeHandler(Id int) {
 	}
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
+}
+
+func (serv GraphService) GetConnectionsForNodeHandler(Id int) (connections []Connection) {
+	// get the connections attached to a given node based on the node's ID
+	fmt.Printf("Asking for connections for node ID: %d \n", Id)
+		
+	for _, conn := range theData.connections {
+		if conn.Source == Id || conn.Target == Id {
+			connections = append(connections, conn)
+		}
+	}
+	
+	if len(connections) > 0 {
+		return connections
+	} else {
+		// could not find any! send 404
+	    serv.ResponseBuilder().SetResponseCode(404).Overide(true)  //Overide causes the entity returned by the method to be ignored. Other wise it would send back zeroed object
+	    return
+	}
+	
 }
 
 /*
