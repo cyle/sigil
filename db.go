@@ -8,14 +8,17 @@ package main
 
 import "fmt"
 import "net/http"
-//import "encoding/json" // documentation: http://golang.org/pkg/encoding/json/
+import "os"
+import "bufio"
+import "encoding/json" // documentation: http://golang.org/pkg/encoding/json/
 
 // using gorest: https://code.google.com/p/gorest/wiki/GettingStarted?tm=6
 import "code.google.com/p/gorest"
 
 type AllTheData struct {
-	nodes []Node
-	connections []Connection
+	Name string
+	Nodes []Node
+	Connections []Connection
 }
 
 type Node struct {
@@ -36,12 +39,14 @@ var theData AllTheData
 
 func main() {
 	
+	theData.Name = "The Graph Database"
+	
 	fmt.Println("Oh dear, a graph database...")
 	
 	// create some dummy nodes!
 	for i := 1; i <= 10; i++ {
 		tmpNode := Node{ i, "Node "+fmt.Sprintf("%d", i), nil, nil }
-		theData.nodes = append(theData.nodes, tmpNode)
+		theData.Nodes = append(theData.Nodes, tmpNode)
 	}
 	
 	// create some dummy connections!
@@ -51,7 +56,9 @@ func main() {
 	connFour := Connection{ 4, "Node 2 to 3", 2, 3 }
 	connFive := Connection{ 5, "Node 3 to 5", 3, 5 }
 	// add connections to the big data pool
-	theData.connections = append(theData.connections, connOne, connTwo, connThree, connFour, connFive)
+	theData.Connections = append(theData.Connections, connOne, connTwo, connThree, connFour, connFive)
+	
+	saveAllTheData();
 	
 	//fmt.Printf("%+v \n", theData)
 	
@@ -95,14 +102,14 @@ func (serv GraphService) RootHandler() string {
 
 func (serv GraphService) GetNodesHandler() []Node {
 	fmt.Println("Sending along current list of nodes")
-	return theData.nodes
+	return theData.Nodes
 }
 
 func (serv GraphService) GetNodeHandler(Id int) (n Node){
 
 	fmt.Printf("Asking for node ID: %d \n", Id)
 	
-	for _, value := range theData.nodes {
+	for _, value := range theData.Nodes {
 		if value.Id == Id {
 			n = value
 			fmt.Printf("Giving: %+v \n", n)
@@ -133,18 +140,18 @@ func (serv GraphService) GetNodeHandler(Id int) (n Node){
 func (serv GraphService) PostNodeHandler(n Node) {
 	fmt.Printf("Just got: %+v \n", n)
 	// check if this already exists. if so, update it.
-	for key, value := range theData.nodes {
+	for key, value := range theData.Nodes {
 		if value.Id == n.Id {
 			fmt.Printf("Updating node ID %d \n", n.Id)
-			theData.nodes[key] = n
+			theData.Nodes[key] = n
 			serv.ResponseBuilder().SetResponseCode(200)
 			return
 		}
 	}
 	// doesn't exist? create it.
 	fmt.Println("Creating new node based on input")
-	n.Id = len(theData.nodes) + 1 // +1 because it's 1-based instead of 0-based
-	theData.nodes = append(theData.nodes, n)
+	n.Id = len(theData.Nodes) + 1 // +1 because it's 1-based instead of 0-based
+	theData.Nodes = append(theData.Nodes, n)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
 }
@@ -152,7 +159,7 @@ func (serv GraphService) PostNodeHandler(n Node) {
 func (serv GraphService) DeleteNodeHandler(Id int) {
 	fmt.Printf("Trying to delete node ID %d \n", Id)
 	thekey := -1
-	for key, value := range theData.nodes {
+	for key, value := range theData.Nodes {
 		if value.Id == Id {
 			thekey = key
 		}
@@ -162,26 +169,26 @@ func (serv GraphService) DeleteNodeHandler(Id int) {
 		//fmt.Printf("Found the node to delete: %d \n", thekey)
 		var tmpWhatever []Node
 		if thekey == 0 {
-			tmpWhatever = make([]Node, len(theData.nodes) - 1)
-			lastPartOfSlice := theData.nodes[1:] // copy everything AFTER the node
+			tmpWhatever = make([]Node, len(theData.Nodes) - 1)
+			lastPartOfSlice := theData.Nodes[1:] // copy everything AFTER the node
 			for _, value := range lastPartOfSlice {
 				//fmt.Printf("Copying node: %+v \n", value)
 				tmpWhatever = append(tmpWhatever, value)
 			}
 		} else {
 			tmpWhatever = make([]Node, thekey)
-			firstPartOfSlice := theData.nodes[:thekey]
+			firstPartOfSlice := theData.Nodes[:thekey]
 			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE the node
 			//fmt.Printf("Nodes so far: %+v \n", tmpWhatever)
 			theNextKey := thekey + 1
-			lastPartOfSlice := theData.nodes[theNextKey:] // copy everything AFTER the node
+			lastPartOfSlice := theData.Nodes[theNextKey:] // copy everything AFTER the node
 			for _, value := range lastPartOfSlice {
 				//fmt.Printf("Copying node: %+v \n", value)
 				tmpWhatever = append(tmpWhatever, value)
 			}
 		}
 		//fmt.Printf("Nodes so far: %+v \n", tmpWhatever)
-		theData.nodes = tmpWhatever
+		theData.Nodes = tmpWhatever
 		//fmt.Printf("Nodes should be copied now!\n")
 		fmt.Println("Node deleted")
 	} else {
@@ -195,7 +202,7 @@ func (serv GraphService) GetConnectionsForNodeHandler(Id int) (connections []Con
 	// get the connections attached to a given node based on the node's ID
 	fmt.Printf("Asking for connections for node ID: %d \n", Id)
 		
-	for _, conn := range theData.connections {
+	for _, conn := range theData.Connections {
 		if conn.Source == Id || conn.Target == Id {
 			connections = append(connections, conn)
 		}
@@ -219,14 +226,14 @@ func (serv GraphService) GetConnectionsForNodeHandler(Id int) (connections []Con
 
 func (serv GraphService) GetConnectionsHandler() []Connection {
 	fmt.Println("Sending along current list of connections")
-	return theData.connections
+	return theData.Connections
 }
 
 func (serv GraphService) GetConnectionHandler(Id int) (c Connection){
 	
 	fmt.Printf("Asking for connection ID: %d \n", Id)
 	
-	for _, value := range theData.connections {
+	for _, value := range theData.Connections {
 		if value.Id == Id {
 			c = value
 			fmt.Printf("Giving: %+v \n", c)
@@ -248,18 +255,18 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 		return
 	}
 	// check to see if connection already exists
-	for key, value := range theData.connections {
+	for key, value := range theData.Connections {
 		if value.Id == c.Id {
 			fmt.Printf("Updating connection ID %d \n", c.Id)
-			theData.connections[key] = c
+			theData.Connections[key] = c
 			serv.ResponseBuilder().SetResponseCode(200)
 			return
 		}
 	}
 	// does not exist! create a new connection.
 	fmt.Println("Creating new connection based on input")
-	c.Id = len(theData.connections) + 1 // +1 because it's 1-based instead of 0-based
-	theData.connections = append(theData.connections, c)
+	c.Id = len(theData.Connections) + 1 // +1 because it's 1-based instead of 0-based
+	theData.Connections = append(theData.Connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
 }
@@ -267,7 +274,7 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 func (serv GraphService) DeleteConnectionHandler(Id int) {
 	fmt.Printf("Trying to delete connection ID %d", Id)
 	thekey := -1
-	for key, value := range theData.connections {
+	for key, value := range theData.Connections {
 		if value.Id == Id {
 			thekey = key
 		}
@@ -275,26 +282,53 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 	if thekey > -1 {
 		var tmpWhatever []Connection
 		if thekey == 0 {
-			tmpWhatever = make([]Connection, len(theData.connections) - 1)
-			lastPartOfSlice := theData.connections[1:] // copy everything AFTER
+			tmpWhatever = make([]Connection, len(theData.Connections) - 1)
+			lastPartOfSlice := theData.Connections[1:] // copy everything AFTER
 			for _, value := range lastPartOfSlice {
 				tmpWhatever = append(tmpWhatever, value)
 			}
 		} else {
 			tmpWhatever = make([]Connection, thekey)
-			firstPartOfSlice := theData.connections[:thekey]
+			firstPartOfSlice := theData.Connections[:thekey]
 			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE
 			theNextKey := thekey + 1
-			lastPartOfSlice := theData.connections[theNextKey:] // copy everything AFTER
+			lastPartOfSlice := theData.Connections[theNextKey:] // copy everything AFTER
 			for _, value := range lastPartOfSlice {
 				tmpWhatever = append(tmpWhatever, value)
 			}
 		}
-		theData.connections = tmpWhatever
+		theData.Connections = tmpWhatever
 		fmt.Println("Connection deleted")
 	} else {
 		fmt.Println("Could not find that connection ID to delete, weird")
 	}
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
+}
+
+/*
+
+	save and load the data
+
+*/
+
+func saveAllTheData() {
+	// spit data out to JSON to a file
+	filename := "ALLTHEDATA.json"
+	// open output file
+    fo, err := os.Create(filename)
+    if err != nil { panic(err) }
+    // close fo on exit and check for its returned error
+    defer func() {
+        if err := fo.Close(); err != nil {
+            panic(err)
+        }
+    }()
+    // make a write buffer
+    w := bufio.NewWriter(fo)
+	allTheDataJSON, err := json.Marshal(theData)
+	if err != nil { panic(err) }
+	_, err = w.Write(allTheDataJSON)
+	if (err != nil) { panic(err) }
+	if err = w.Flush(); err != nil { panic(err) }
 }
