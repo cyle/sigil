@@ -132,6 +132,17 @@ func (serv GraphService) GetNodeHandler(Id int) (n Node){
 
 func (serv GraphService) PostNodeHandler(n Node) {
 	fmt.Printf("Just got: %+v \n", n)
+	// check if this already exists. if so, update it.
+	for key, value := range theData.nodes {
+		if value.Id == n.Id {
+			fmt.Printf("Updating node ID %d \n", n.Id)
+			theData.nodes[key] = n
+			serv.ResponseBuilder().SetResponseCode(200)
+			return
+		}
+	}
+	// doesn't exist? create it.
+	fmt.Println("Creating new node based on input")
 	n.Id = len(theData.nodes)
 	theData.nodes = append(theData.nodes, n)
 	serv.ResponseBuilder().SetResponseCode(201)
@@ -230,11 +241,22 @@ func (serv GraphService) GetConnectionHandler(Id int) (c Connection){
 
 func (serv GraphService) PostConnectionHandler(c Connection) {
 	fmt.Printf("Just got: %+v \n", c)
+	// make sure it's not invalid
 	if c.Source == c.Target {
 		fmt.Println("Cannot create connection where SOURCE and TARGET are the same")
 		serv.ResponseBuilder().SetResponseCode(400).Overide(true)
 		return
 	}
+	// check to see if connection already exists
+	for key, value := range theData.connections {
+		if value.Id == c.Id {
+			fmt.Printf("Updating connection ID %d \n", c.Id)
+			theData.connections[key] = c
+			serv.ResponseBuilder().SetResponseCode(200)
+			return
+		}
+	}
+	// does not exist! create a new connection.
 	c.Id = len(theData.connections)
 	theData.connections = append(theData.connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
