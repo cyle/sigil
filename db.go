@@ -145,6 +145,7 @@ func (serv GraphService) DeleteNodeHandler(Id int) {
 			thekey = key
 		}
 	}
+	// look at all of this bullshit we have to do because of memory management
 	if thekey > -1 {
 		//fmt.Printf("Found the node to delete: %d \n", thekey)
 		var tmpWhatever []Node
@@ -223,15 +224,15 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 		}
 	}
 	if thekey > -1 {
-		var tmpWhatever []Node
+		var tmpWhatever []Connection
 		if thekey == 0 {
-			tmpWhatever = make([]Node, len(theData.connections) - 1)
+			tmpWhatever = make([]Connection, len(theData.connections) - 1)
 			lastPartOfSlice := theData.connections[1:] // copy everything AFTER
 			for _, value := range lastPartOfSlice {
 				tmpWhatever = append(tmpWhatever, value)
 			}
 		} else {
-			tmpWhatever = make([]Node, thekey)
+			tmpWhatever = make([]Connection, thekey)
 			firstPartOfSlice := theData.connections[:thekey]
 			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE
 			theNextKey := thekey + 1
