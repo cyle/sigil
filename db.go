@@ -209,6 +209,11 @@ func (serv GraphService) GetConnectionHandler(Id int) (c Connection){
 
 func (serv GraphService) PostConnectionHandler(c Connection) {
 	fmt.Printf("Just got: %+v \n", c)
+	if c.Source == c.Target {
+		fmt.Println("Cannot create connection where SOURCE and TARGET are the same")
+		serv.ResponseBuilder().SetResponseCode(400).Overide(true)
+		return
+	}
 	c.Id = len(theData.connections)
 	theData.connections = append(theData.connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
