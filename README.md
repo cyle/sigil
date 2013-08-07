@@ -8,6 +8,40 @@ This is supposed to be just a very simple graph database, accessible via a REST 
 
 This is still in very, very early development. It's not really usable yet in any substantial way.
 
+## how to use
+
+First, set up your Go working directory:
+
+    mkdir simple-graph-database
+    cd simple-graph-database
+
+Next, set your $GOPATH to this working directory (you'll need this to install the `gorest` package later):
+
+    export GOPATH=`pwd`
+
+Next, create the necessary working directory subdirectories (based on the [how to write Go code](http://golang.org/doc/code.html#Workspaces) document):
+
+    mkdir src pkg bin
+
+Okay cool -- now clone in this repo to the `src/` directory:
+
+    git clone git@github.com:cyle/simple-graph-database.git src/
+
+Right now this primarily relies on the `gorest` third-party package. To install it, do:
+
+    go get code.google.com/p/gorest
+
+That should be it for installing things. Now to run this database:
+
+    cd src/
+    go run db.go
+
+That's it... go to `http://localhost:8777/` to see if it's working. That'll be your API endpoint.
+
+## API documentation
+
+To use the graph database in an application, visit the [API doc](API.md).
+
 ## ideas / lists
 
 documents:
