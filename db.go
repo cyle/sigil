@@ -133,11 +133,47 @@ func (serv GraphService) PostNodeHandler(n Node) {
 	fmt.Printf("Just got: %+v \n", n)
 	n.Id = len(theData.nodes)
 	theData.nodes = append(theData.nodes, n)
-	serv.ResponseBuilder().SetResponseCode(200)
+	serv.ResponseBuilder().SetResponseCode(201)
 	return
 }
 
 func (serv GraphService) DeleteNodeHandler(Id int) {
+	fmt.Printf("Trying to delete node ID %d \n", Id)
+	thekey := -1
+	for key, value := range theData.nodes {
+		if value.Id == Id {
+			thekey = key
+		}
+	}
+	if thekey > -1 {
+		//fmt.Printf("Found the node to delete: %d \n", thekey)
+		var tmpWhatever []Node
+		if thekey == 0 {
+			tmpWhatever = make([]Node, len(theData.nodes) - 1)
+			lastPartOfSlice := theData.nodes[1:] // copy everything AFTER the node
+			for _, value := range lastPartOfSlice {
+				//fmt.Printf("Copying node: %+v \n", value)
+				tmpWhatever = append(tmpWhatever, value)
+			}
+		} else {
+			tmpWhatever = make([]Node, thekey)
+			firstPartOfSlice := theData.nodes[:thekey]
+			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE the node
+			//fmt.Printf("Nodes so far: %+v \n", tmpWhatever)
+			theNextKey := thekey + 1
+			lastPartOfSlice := theData.nodes[theNextKey:] // copy everything AFTER the node
+			for _, value := range lastPartOfSlice {
+				//fmt.Printf("Copying node: %+v \n", value)
+				tmpWhatever = append(tmpWhatever, value)
+			}
+		}
+		//fmt.Printf("Nodes so far: %+v \n", tmpWhatever)
+		theData.nodes = tmpWhatever
+		//fmt.Printf("Nodes should be copied now!\n")
+		fmt.Println("Node deleted")
+	} else {
+		fmt.Println("Could not find that node ID to delete, weird")
+	}
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
 }
@@ -174,11 +210,41 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 	fmt.Printf("Just got: %+v \n", c)
 	c.Id = len(theData.connections)
 	theData.connections = append(theData.connections, c)
-	serv.ResponseBuilder().SetResponseCode(200)
+	serv.ResponseBuilder().SetResponseCode(201)
 	return
 }
 
 func (serv GraphService) DeleteConnectionHandler(Id int) {
+	fmt.Printf("Trying to delete connection ID %d", Id)
+	thekey := -1
+	for key, value := range theData.connections {
+		if value.Id == Id {
+			thekey = key
+		}
+	}
+	if thekey > -1 {
+		var tmpWhatever []Node
+		if thekey == 0 {
+			tmpWhatever = make([]Node, len(theData.connections) - 1)
+			lastPartOfSlice := theData.connections[1:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				tmpWhatever = append(tmpWhatever, value)
+			}
+		} else {
+			tmpWhatever = make([]Node, thekey)
+			firstPartOfSlice := theData.connections[:thekey]
+			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE
+			theNextKey := thekey + 1
+			lastPartOfSlice := theData.connections[theNextKey:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				tmpWhatever = append(tmpWhatever, value)
+			}
+		}
+		theData.connections = tmpWhatever
+		fmt.Println("Connection deleted")
+	} else {
+		fmt.Println("Could not find that connection ID to delete, weird")
+	}
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
 }
