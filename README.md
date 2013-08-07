@@ -41,6 +41,8 @@ query actions:
 	- return whole path between nodes
 	- need "max depth" parameter to limit ridiculousness
 	- options for either "get all paths" or "get shortest path"
+- get all nodes connected to node
+	- list of nodes and connections they're based on
 
 backend stuff:
 
