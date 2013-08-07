@@ -70,11 +70,13 @@ type GraphService struct{
     rootHandler gorest.EndPoint `method:"GET" path:"/" output:"string"`
 	
 	// node stuff
+	getNodesHandler gorest.EndPoint `method:"GET" path:"/nodes" output:"[]Node"`
 	getNodeHandler gorest.EndPoint `method:"GET" path:"/node/{Id:int}" output:"Node"`
 	postNodeHandler gorest.EndPoint `method:"POST" path:"/node" postdata:"Node"`
 	deleteNodeHandler gorest.EndPoint `method:"DELETE" path:"/node/{Id:int}"`
 	
 	// connections stuff
+	getConnectionsHandler gorest.EndPoint `method:"GET" path:"/connections" output:"[]Connection"`
 	getConnectionHandler gorest.EndPoint `method:"GET" path:"/connection/{Id:int}" output:"Connection"`
 	postConnectionHandler gorest.EndPoint `method:"POST" path:"/connection" postdata:"Connection"`
 	deleteConnectionHandler gorest.EndPoint `method:"DELETE" path:"/connection/{Id:int}"`
@@ -89,6 +91,11 @@ func (serv GraphService) RootHandler() string {
 	node functions
 
 */
+
+func (serv GraphService) GetNodesHandler() []Node {
+	fmt.Println("Sending along current list of nodes")
+	return theData.nodes
+}
 
 func (serv GraphService) GetNodeHandler(Id int) (n Node){
 
@@ -140,6 +147,11 @@ func (serv GraphService) DeleteNodeHandler(Id int) {
 	connection functions
 
 */
+
+func (serv GraphService) GetConnectionsHandler() []Connection {
+	fmt.Println("Sending along current list of connections")
+	return theData.connections
+}
 
 func (serv GraphService) GetConnectionHandler(Id int) (c Connection){
 	
