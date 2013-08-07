@@ -39,17 +39,17 @@ func main() {
 	fmt.Println("Oh dear, a graph database...")
 	
 	// create some dummy nodes!
-	for i := 1; i <= 10; i++ {
+	for i := 0; i < 10; i++ {
 		tmpNode := Node{ i, "Node "+fmt.Sprintf("%d", i), nil, nil }
 		theData.nodes = append(theData.nodes, tmpNode)
 	}
 	
 	// create some dummy connections!
-	connOne := Connection{ 1, "Node 1 to 2", 1, 2 }
-	connTwo := Connection{ 2, "Node 2 to 4", 2, 4 }
-	connThree := Connection{ 3, "Node 4 to 5", 4, 5 }
-	connFour := Connection{ 4, "Node 2 to 3", 2, 3 }
-	connFive := Connection{ 5, "Node 3 to 5", 3, 5 }
+	connOne := Connection{ 0, "Node 1 to 2", 1, 2 }
+	connTwo := Connection{ 1, "Node 2 to 4", 2, 4 }
+	connThree := Connection{ 2, "Node 4 to 5", 4, 5 }
+	connFour := Connection{ 3, "Node 2 to 3", 2, 3 }
+	connFive := Connection{ 4, "Node 3 to 5", 3, 5 }
 	// add connections to the big data pool
 	theData.connections = append(theData.connections, connOne, connTwo, connThree, connFour, connFive)
 	
@@ -68,15 +68,29 @@ type GraphService struct{
 	
 	// deal with the root
     rootHandler gorest.EndPoint `method:"GET" path:"/" output:"string"`
+	
+	// node stuff
 	getNodeHandler gorest.EndPoint `method:"GET" path:"/node/{Id:int}" output:"Node"`
+	postNodeHandler gorest.EndPoint `method:"POST" path:"/node" postdata:"Node"`
+	deleteNodeHandler gorest.EndPoint `method:"DELETE" path:"/node/{Id:int}"`
+	
+	// connections stuff
 	getConnectionHandler gorest.EndPoint `method:"GET" path:"/connection/{Id:int}" output:"Connection"`
+	postConnectionHandler gorest.EndPoint `method:"POST" path:"/connection" postdata:"Connection"`
+	deleteConnectionHandler gorest.EndPoint `method:"DELETE" path:"/connection/{Id:int}"`
 }
 
-func(serv GraphService) RootHandler() string {
+func (serv GraphService) RootHandler() string {
 	return "Simple Graph Database, v0.1"
 }
 
-func(serv GraphService) GetNodeHandler(Id int) (n Node){
+/*
+
+	node functions
+
+*/
+
+func (serv GraphService) GetNodeHandler(Id int) (n Node){
 
 	fmt.Printf("Asking for node ID: %d \n", Id)
 	
@@ -108,7 +122,26 @@ func(serv GraphService) GetNodeHandler(Id int) (n Node){
     return
 }
 
-func(serv GraphService) GetConnectionHandler(Id int) (c Connection){
+func (serv GraphService) PostNodeHandler(n Node) {
+	fmt.Printf("Just got: %+v \n", n)
+	n.Id = len(theData.nodes)
+	theData.nodes = append(theData.nodes, n)
+	serv.ResponseBuilder().SetResponseCode(200)
+	return
+}
+
+func (serv GraphService) DeleteNodeHandler(Id int) {
+	serv.ResponseBuilder().SetResponseCode(200)
+	return
+}
+
+/*
+
+	connection functions
+
+*/
+
+func (serv GraphService) GetConnectionHandler(Id int) (c Connection){
 	
 	fmt.Printf("Asking for connection ID: %d \n", Id)
 	
@@ -123,4 +156,17 @@ func(serv GraphService) GetConnectionHandler(Id int) (c Connection){
 	// could not find it! send 404
     serv.ResponseBuilder().SetResponseCode(404).Overide(true)  //Overide causes the entity returned by the method to be ignored. Other wise it would send back zeroed object
     return
+}
+
+func (serv GraphService) PostConnectionHandler(c Connection) {
+	fmt.Printf("Just got: %+v \n", c)
+	c.Id = len(theData.connections)
+	theData.connections = append(theData.connections, c)
+	serv.ResponseBuilder().SetResponseCode(200)
+	return
+}
+
+func (serv GraphService) DeleteConnectionHandler(Id int) {
+	serv.ResponseBuilder().SetResponseCode(200)
+	return
 }
