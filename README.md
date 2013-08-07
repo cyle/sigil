@@ -46,6 +46,10 @@ query actions:
 
 backend stuff:
 
+- config file
+	- whether to save to disk or just keep in memory
+	- how often to save to disk
+	- where to save to disk
 - flush/save data to disk
 - load from disk on startup, if file exists
 
