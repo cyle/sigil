@@ -9,6 +9,7 @@ package main
 import "fmt"
 import "net/http"
 import "os"
+import "io/ioutil"
 import "bufio"
 import "encoding/json" // documentation: http://golang.org/pkg/encoding/json/
 
@@ -35,6 +36,7 @@ type Connection struct {
 	Target int
 }
 
+var db_filename string = "ALLTHEDATA.json"
 var theData AllTheData
 
 func main() {
@@ -43,12 +45,12 @@ func main() {
 	
 	fmt.Println("Oh dear, a graph database...")
 	
+	/*
 	// create some dummy nodes!
 	for i := 1; i <= 10; i++ {
 		tmpNode := Node{ i, "Node "+fmt.Sprintf("%d", i), nil, nil }
 		theData.Nodes = append(theData.Nodes, tmpNode)
 	}
-	
 	// create some dummy connections!
 	connOne := Connection{ 1, "Node 1 to 2", 1, 2 }
 	connTwo := Connection{ 2, "Node 2 to 4", 2, 4 }
@@ -57,11 +59,14 @@ func main() {
 	connFive := Connection{ 5, "Node 3 to 5", 3, 5 }
 	// add connections to the big data pool
 	theData.Connections = append(theData.Connections, connOne, connTwo, connThree, connFour, connFive)
+	*/
 	
-	saveAllTheData();
-	
-	//fmt.Printf("%+v \n", theData)
-	
+	// if the database file exists, load it
+	check, _ := doesFileExist(db_filename);
+	if check {
+		loadAllTheData()
+	}
+		
 	// start the REST service to access the data
 	gorest.RegisterService(new(GraphService))
 	http.Handle("/", gorest.Handle())    
@@ -88,10 +93,20 @@ type GraphService struct{
 	getConnectionHandler gorest.EndPoint `method:"GET" path:"/connection/{Id:int}" output:"Connection"`
 	postConnectionHandler gorest.EndPoint `method:"POST" path:"/connection" postdata:"Connection"`
 	deleteConnectionHandler gorest.EndPoint `method:"DELETE" path:"/connection/{Id:int}"`
+	
+	// save the database
+	saveDatabaseHandler gorest.EndPoint `method:"GET" path:"/save" output:"string"`
 }
 
 func (serv GraphService) RootHandler() string {
 	return "Simple Graph Database, v0.1"
+}
+
+func (serv GraphService) SaveDatabaseHandler() string {
+	fmt.Println("Saving database to file")
+	saveAllTheData();
+	fmt.Println("Saved database to file")
+	return "okay"
 }
 
 /*
@@ -313,10 +328,9 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 */
 
 func saveAllTheData() {
-	// spit data out to JSON to a file
-	filename := "ALLTHEDATA.json"
+	// spit data out to JSON into a file
 	// open output file
-    fo, err := os.Create(filename)
+    fo, err := os.Create(db_filename)
     if err != nil { panic(err) }
     // close fo on exit and check for its returned error
     defer func() {
@@ -331,4 +345,27 @@ func saveAllTheData() {
 	_, err = w.Write(allTheDataJSON)
 	if (err != nil) { panic(err) }
 	if err = w.Flush(); err != nil { panic(err) }
+}
+
+func loadAllTheData() {
+	// ingest data via JSON from a file
+	allJSON, err := ioutil.ReadFile(db_filename)
+	if err != nil { panic(err) }
+	unmarshal_err := json.Unmarshal(allJSON, &theData)
+	if unmarshal_err != nil { panic(unmarshal_err) }
+}
+
+/*
+
+	helper functions
+
+*/
+
+// exists returns whether the given file or directory exists or not
+// from: http://stackoverflow.com/questions/10510691/how-to-check-whether-a-file-or-directory-denoted-by-a-path-exists-in-golang
+func doesFileExist(path string) (bool, error) {
+    _, err := os.Stat(path)
+    if err == nil { return true, nil }
+    if os.IsNotExist(err) { return false, nil }
+    return false, err
 }
