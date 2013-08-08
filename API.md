@@ -49,3 +49,7 @@ As a special note, if you do an above "update" type command, if the ID you're tr
 You can delete a node by sending a DELETE request to `/node/:id` where `:id` is the unique node ID you'd like to have deleted.
 
 You can delete a connection by sending a DELETE request to `/connection/:id` where `:id` is the unique connection ID you'd like to have deleted.
+
+## Saving
+
+You can save the current database to disk by sending a GET request to `/save`, you should get an "okay" in return.
