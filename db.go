@@ -352,21 +352,23 @@ func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connection
 	foundTarget := false
 	
 	nodeQueue := make([]int, 1)
-	nodeQueue = append(nodeQueue, Source)
+	nodeQueue[0] = Source
 
-	//nodeMarked := make([]int, 1)
-	//nodeMarked = append(nodeMarked, Source)
-	nodeMarked := Source
+	nodeMarked := make([]int, 1)
+	nodeMarked[0] = Source
 	
 	for len(nodeQueue) != 0 {
-		if tries > 25 { break }
-		tmpNode, nodeQueue := nodeQueue[len(nodeQueue)-1], nodeQueue[:len(nodeQueue)-1]
-		fmt.Printf("current node is %d \n", tmpNode)
+		//fmt.Printf("Queue looks like: %+v \n", nodeQueue)
+		//fmt.Printf("List of marked nodes looks like: %+v \n", nodeMarked)
+		if tries > 100 { break }
+		tmpNode := nodeQueue[0] // take first element
+		nodeQueue = nodeQueue[1:] // remove first element
+		//fmt.Printf("current node is %d \n", tmpNode)
 		if tmpNode == Target {
 			foundTarget = true
 			break
 		} else {
-			fmt.Println("not directly connected, getting connections...")
+			//fmt.Println("not directly connected, getting connections...")
 			for _, conn := range theData.Connections {
 				if conn.Source == tmpNode || conn.Target == tmpNode {
 					nextNode := 0
@@ -375,15 +377,13 @@ func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connection
 					} else {
 						nextNode = conn.Source
 					}
-					fmt.Printf("seeing if %d is marked... \n", nextNode)
-					//if doesIntExist(nextNode, nodeMarked) == false {
-					if nodeMarked != nextNode {
-						//nodeMarked = append(nodeMarked, nextNode)
-						nodeMarked = nextNode
+					//fmt.Printf("seeing if %d is marked... \n", nextNode)
+					if doesIntExist(nextNode, nodeMarked) == false {
+						nodeMarked = append(nodeMarked, nextNode)
 						nodeQueue = append(nodeQueue, nextNode)
-						fmt.Println("not marked, going deeper...")
+						//fmt.Println("not marked, going deeper...")
 					} else {
-						fmt.Println("marked, skipping along")
+						//fmt.Println("marked, skipping along")
 					}
 				}
 			}
@@ -392,9 +392,11 @@ func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connection
 	}
 	
 	if foundTarget {
-		fmt.Println("found the target!")
+		fmt.Printf("found the target, took %d iterations! \n", tries)
+		fmt.Printf("final list of queued nodes: %+v \n", nodeQueue)
+		fmt.Printf("final list of marked nodes: %+v \n", nodeMarked)
 	} else {
-		fmt.Println("could not find route to target")
+		fmt.Println("could not find route to target within 200 iterations")
 	}
 	
 	
