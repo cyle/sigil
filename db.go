@@ -67,7 +67,7 @@ func main() {
 		connNine := Connection{ 5, "Node 3 to 7", 3, 7 }
 		connTen := Connection{ 5, "Node 7 to 5", 7, 5 }
 		// add connections to the big data pool
-		theData.Connections = append(theData.Connections, connOne, connTwo, connThree, connFour, connFive)
+		theData.Connections = append(theData.Connections, connOne, connTwo, connThree, connFour, connFive, connSix, connSeven, connEight, connNine, connTen)
 		// save this dummy data for future use
 		saveAllTheData()
 	}
