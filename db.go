@@ -366,11 +366,21 @@ func loadAllTheData() {
 
 */
 
-// exists returns whether the given file or directory exists or not
+// doesFileExist returns whether the given file or directory exists or not
 // from: http://stackoverflow.com/questions/10510691/how-to-check-whether-a-file-or-directory-denoted-by-a-path-exists-in-golang
 func doesFileExist(path string) (bool, error) {
     _, err := os.Stat(path)
     if err == nil { return true, nil }
     if os.IsNotExist(err) { return false, nil }
     return false, err
+}
+
+// checks if int is inside of a slice
+func doesIntExist(needle int, haystack []int) bool {
+	for _, val := range haystack {
+		if val == needle {
+			return true
+		}
+	}
+	return false
 }
