@@ -82,6 +82,7 @@ type GraphService struct{
 	postNodeHandler gorest.EndPoint `method:"POST" path:"/node" postdata:"Node"`
 	deleteNodeHandler gorest.EndPoint `method:"DELETE" path:"/node/{Id:int}"`
 	getConnectionsForNodeHandler gorest.EndPoint `method:"GET" path:"/node/{Id:int}/connections" output:"[]Connection"`
+	getAdjacentNodesHandler gorest.EndPoint `method:"GET" path:"/node/{Id:int}/adjacent" output:"[]Node"`
 	
 	// connections stuff
 	getConnectionsHandler gorest.EndPoint `method:"GET" path:"/connections" output:"[]Connection"`
@@ -90,7 +91,7 @@ type GraphService struct{
 	deleteConnectionHandler gorest.EndPoint `method:"DELETE" path:"/connection/{Id:int}"`
 	
 	// paths stuff
-	getDistanceBetweenNodes gorest.EndPoint `method:"GET" path:"/distance/from/{Source:int}/to/{Target:int}" output:"string"`
+	getDistanceBetweenNodesHandler gorest.EndPoint `method:"GET" path:"/distance/from/{Source:int}/to/{Target:int}" output:"string"`
 	getPathBetweenNodes gorest.EndPoint `method:"GET" path:"/path/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
 	//getPathsBetweenNodes gorest.EndPoint `method:"GET" path:"/paths/from/{Source:int}/to/{Target:int}" output:"[][]Connection"`
 	getShortestPathBetweenNodes gorest.EndPoint `method:"GET" path:"/shortest/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
@@ -121,17 +122,23 @@ func (serv GraphService) GetNodesHandler() []Node {
 	return theData.Nodes
 }
 
+func getNode(Id int) (n Node) {
+	// go through all the nodes and return the one with the given ID
+	for _, value := range theData.Nodes {
+		if value.Id == Id {
+			n = value
+		}
+	}
+	return
+}
+
 func (serv GraphService) GetNodeHandler(Id int) (n Node){
 	
 	fmt.Printf("Asking for node ID: %d \n", Id)
 	
-	for _, value := range theData.Nodes {
-		if value.Id == Id {
-			n = value
-			fmt.Printf("Giving: %+v \n", n)
-			return
-		}
-	}
+	n = getNode(Id)
+	
+	fmt.Printf("Giving: %+v \n", n)
 	
 	/*
 	n.Id = Id
@@ -239,6 +246,31 @@ func (serv GraphService) GetConnectionsForNodeHandler(Id int) (connections []Con
 	
 }
 
+func getAdjacentNodes(Id int) (nodes []Node) {
+	// go through connections, get ones that are connected to this node
+	for _, conn := range theData.Connections {
+		if conn.Source == Id {
+			nodes = append(nodes, getNode(conn.Target))
+		} else if conn.Target == Id {
+			nodes = append(nodes, getNode(conn.Source))
+		}
+	}
+	return
+}
+
+func (serv GraphService) GetAdjacentNodesHandler(Id int) (nodes []Node) {
+	
+	nodes = getAdjacentNodes(Id);
+	
+	if len(nodes) > 0 {
+		return
+	} else {
+		// could not find any! send 404
+	    serv.ResponseBuilder().SetResponseCode(404).Overide(true)  //Overide causes the entity returned by the method to be ignored. Other wise it would send back zeroed object
+	    return
+	}
+}
+
 /*
 
 	connection functions
@@ -333,10 +365,8 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 
 */
 
-func (serv GraphService) GetDistanceBetweenNodes(Source int, Target int) string {
-	
-	fmt.Printf("Getting raw distance between nodes %d and %d \n", Source, Target)
-	
+func getDistanceBetweenNodes(Source int, Target int) (distance float64) {
+
 	var x1 int
 	var y1 int
 	var z1 int
@@ -364,7 +394,16 @@ func (serv GraphService) GetDistanceBetweenNodes(Source int, Target int) string 
 	yD := y2 - y1
 	zD := z2 - z1	
 	toSqrt := float64((xD * xD) + (yD * yD) + (zD * zD))	
-	distance := math.Sqrt( toSqrt )
+	distance = math.Sqrt( toSqrt )
+	
+	return
+}
+
+func (serv GraphService) GetDistanceBetweenNodesHandler(Source int, Target int) string {
+	
+	fmt.Printf("Getting raw distance between nodes %d and %d \n", Source, Target)
+	
+	distance := getDistanceBetweenNodes(Source, Target)
 	
 	fmt.Printf("Raw distance between nodes %d and %d is %f \n", Source, Target, distance)
 	
