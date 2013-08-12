@@ -7,6 +7,7 @@
 package main
 
 import "fmt"
+import "math"
 import "net/http"
 import "os"
 import "io/ioutil"
@@ -89,6 +90,7 @@ type GraphService struct{
 	deleteConnectionHandler gorest.EndPoint `method:"DELETE" path:"/connection/{Id:int}"`
 	
 	// paths stuff
+	getDistanceBetweenNodes gorest.EndPoint `method:"GET" path:"/distance/from/{Source:int}/to/{Target:int}" output:"string"`
 	getPathBetweenNodes gorest.EndPoint `method:"GET" path:"/path/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
 	//getPathsBetweenNodes gorest.EndPoint `method:"GET" path:"/paths/from/{Source:int}/to/{Target:int}" output:"[][]Connection"`
 	getShortestPathBetweenNodes gorest.EndPoint `method:"GET" path:"/shortest/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
@@ -120,7 +122,7 @@ func (serv GraphService) GetNodesHandler() []Node {
 }
 
 func (serv GraphService) GetNodeHandler(Id int) (n Node){
-
+	
 	fmt.Printf("Asking for node ID: %d \n", Id)
 	
 	for _, value := range theData.Nodes {
@@ -331,8 +333,52 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 
 */
 
+func (serv GraphService) GetDistanceBetweenNodes(Source int, Target int) string {
+	
+	fmt.Printf("Getting raw distance between nodes %d and %d \n", Source, Target)
+	
+	var x1 int
+	var y1 int
+	var z1 int
+	
+	var x2 int
+	var y2 int
+	var z2 int
+	
+	// get X and Y of the Source node
+	// get X and Y of the Target node
+	for _, node := range theData.Nodes {
+		if (node.Id == Source) {
+			x1 = node.X
+			y1 = node.Y
+			z1 = node.Z
+		} else if (node.Id == Target) {
+			x2 = node.X
+			y2 = node.Y
+			z2 = node.Z
+		}
+	}
+	
+	// return distance as a string
+	xD := x2 - x1
+	yD := y2 - y1
+	zD := z2 - z1	
+	toSqrt := float64((xD * xD) + (yD * yD) + (zD * zD))	
+	distance := math.Sqrt( toSqrt )
+	
+	fmt.Printf("Raw distance between nodes %d and %d is %f \n", Source, Target, distance)
+	
+	return fmt.Sprintf("%f", distance)
+	
+}
+
 func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connections []Connection) {
 	fmt.Printf("Using A* to get a connection path between nodes %d and %d \n", Source, Target)
+	
+	// references:
+	//   http://www.raywenderlich.com/4946/introduction-to-a-pathfinding
+	//   http://www.raywenderlich.com/4970/how-to-implement-a-pathfinding-with-cocos2d-tutorial
+	//   http://theory.stanford.edu/~amitp/GameProgramming/
 	
 	// make:
 	// open list - all nodes being considered for the path
@@ -342,7 +388,7 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 	// all nodes connected to current node goes into the open list
 	
 	// each node's score is F, which is G + H
-	// G is the distance from the current node
+	// G is the distance from the current node (always current G score + 1)
 	// H is the (estimated) distance to the destination node
 	
 	// the loop:
@@ -350,11 +396,22 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 	//   what if there are more than one? take the most recent one added
 	// remove that node from the open list and add it to the closed list
 	// for each node connected to that node:
-	// if it's already in the closed list, ignore it
-	// if it's not in the open list, add it to the open list and compute its F score
-	// if it's already in the open list, check if its F score is lower when we use the node we're on as the path, if so, update its score and its parent (the current node)
+	//   if it's already in the closed list, ignore it
+	//   if it's not in the open list, add it to the open list and compute its F score
+	//   if it's already in the open list, 
+	//     check if its G score is lower than the current node's G score + 1
+	//       if so, update its G score to be current node's G score + 1
 	
+	// need:
+	// open list with nodes and their H and G scores
+	// AstarNode { properties: hScore, gScore, parentNode; methods: fScore, adjacentNodes, calcHScore }
+	// OpenList is a slice of these AstarNodes
+	// closedList is just a slice of Node ID ints
+	// method to get node in open list with lowest F score (which is H + G)
+	// method to get adjacent nodes (already have that)
+	// method to get "parent" node in working set
 	
+	return
 }
 
 func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connections []Connection) {
