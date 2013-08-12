@@ -48,28 +48,12 @@ func main() {
 	// if the database file exists, load it
 	check, _ := doesFileExist(db_filename);
 	if check {
+		fmt.Println("Loading data from file...")
 		loadAllTheData()
+		fmt.Println("Loaded.")
 	} else {
-		// create some dummy nodes!
-		for i := 1; i <= 10; i++ {
-			tmpNode := Node{ i, "Node "+fmt.Sprintf("%d", i), nil, nil }
-			theData.Nodes = append(theData.Nodes, tmpNode)
-		}
-		// create some dummy connections!
-		connOne := Connection{ 1, "Node 1 to 2", 1, 2 }
-		connTwo := Connection{ 2, "Node 2 to 3", 2, 3 }
-		connThree := Connection{ 3, "Node 3 to 4", 3, 4 }
-		connFour := Connection{ 4, "Node 4 to 5", 4, 5 }
-		connFive := Connection{ 5, "Node 5 to 6", 5, 6 }
-		connSix := Connection{ 5, "Node 3 to 9", 3, 9 }
-		connSeven := Connection{ 5, "Node 9 to 8", 9, 8 }
-		connEight := Connection{ 5, "Node 8 to 3", 8, 3 }
-		connNine := Connection{ 5, "Node 3 to 7", 3, 7 }
-		connTen := Connection{ 5, "Node 7 to 5", 7, 5 }
-		// add connections to the big data pool
-		theData.Connections = append(theData.Connections, connOne, connTwo, connThree, connFour, connFive, connSix, connSeven, connEight, connNine, connTen)
-		// save this dummy data for future use
-		saveAllTheData()
+		// wat do if no data? leave it all blank, i guess
+		fmt.Println("No data, providing blank database.")
 	}
 		
 	// start the REST service to access the data
