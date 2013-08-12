@@ -342,6 +342,32 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 
 */
 
+func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connections []Connection) {
+	fmt.Printf("Using A* to get a connection path between nodes %d and %d \n", Source, Target)
+	
+	// make:
+	// open list - all nodes being considered for the path
+	// closed list -- all the nodes definitely not to consider again
+	
+	// current node goes into the closed list, of course
+	// all nodes connected to current node goes into the open list
+	
+	// each node's score is F, which is G + H
+	// G is the distance from the current node
+	// H is the (estimated) distance to the destination node
+	
+	// the loop:
+	// get the node in the open list that has the lowest score.
+	//   what if there are more than one? take the most recent one added
+	// remove that node from the open list and add it to the closed list
+	// for each node connected to that node:
+	// if it's already in the closed list, ignore it
+	// if it's not in the open list, add it to the open list and compute its F score
+	// if it's already in the open list, check if its F score is lower when we use the node we're on as the path, if so, update its score and its parent (the current node)
+	
+	
+}
+
 func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connections []Connection) {
 	fmt.Printf("Get a connection path between nodes %d and %d \n", Source, Target)
 	
@@ -399,90 +425,6 @@ func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connection
 		fmt.Println("could not find route to target within 200 iterations")
 	}
 	
-	
-	/*
-	// tree traversal -- go through every connection from source node until you find target node
-	// and add that path to the array of paths
-	
-	endingFound := false
-	goingFrom := Source // the node ID we are currently at, it starts at the source
-	connectionsCheckedSoFar := make([]int, 1) // keep track of the connection IDs we've checked so far
-	numConnectionsCheckedSoFar := 0
-	maxConnectionsToCheck := len(theData.Connections)
-	
-	// to start -- go through all the connections til you find one that comes from or goes to the source node ID
-	
-	// then -- go through all the connections again to find the one that connects to the last one
-	
-	// keep going til the target node is found!
-	
-	for {
-
-		if numConnectionsCheckedSoFar == maxConnectionsToCheck { 
-			fmt.Println("ran out of connections to check, no path exists...?")
-			serv.ResponseBuilder().SetResponseCode(400).Overide(true)
-			break 
-		}
-		
-		fmt.Printf("Going from node #%d \n", goingFrom)
-		
-		// go through the list of connections, find one that is "goingFrom"
-		// if found, check to see if the target is attached: if so, endingFound = true
-		// if not, set the goingFrom to the target, and keep trying
-		
-		// check for straight shots
-		for _, conn := range theData.Connections {
-			fmt.Printf("Checking out connection to see if it's a straight shot: %+v \n", conn)
-			// is there a straight hop from source to target...?
-			if conn.Target == goingFrom && conn.Source == Target {
-				// we've reached the end! yay!
-				connections = append(connections, conn)
-				endingFound = true
-				break
-			} else if conn.Source == goingFrom && conn.Target == Target {
-				// we've reached the end! yay!
-				connections = append(connections, conn)
-				endingFound = true
-				break
-			}
-		}
-		
-		if endingFound { 
-			fmt.Println("Found the end! yay!")
-			break 
-		}
-		
-		// ok, check for a node to hop along to
-		for _, conn := range theData.Connections {
-			fmt.Printf("Checking out connection: %+v \n", conn)
-			// no straight hop found -- keep going
-			if doesIntExist(conn.Id, connectionsCheckedSoFar) { // if connection already checked, go on
-				fmt.Println("This connection has already been checked, skipping...")
-			} else if conn.Source == goingFrom {
-				// the next hop will be this conn's target
-				goingFrom = conn.Target
-				connections = append(connections, conn)
-				fmt.Printf("the next hop will be from node #%d \n", goingFrom)
-				connectionsCheckedSoFar = append(connectionsCheckedSoFar, conn.Id)
-				break
-			} else if conn.Target == goingFrom {
-				// the next hop will be this conn's source
-				goingFrom = conn.Source
-				connections = append(connections, conn)
-				fmt.Printf("the next hop will be from node #%d \n", goingFrom)
-				connectionsCheckedSoFar = append(connectionsCheckedSoFar, conn.Id)
-				break
-			} else {
-				//panic("oh no, i've hit a wall")
-				// ignore the ones that aren't attached to anything we're interested in
-				fmt.Println("Not connected to anything we're interested in, skipping...")
-			}
-		}
-		
-		numConnectionsCheckedSoFar += 1
-		
-	}
-	*/
 	return
 }
 
