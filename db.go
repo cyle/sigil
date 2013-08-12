@@ -25,6 +25,9 @@ type AllTheData struct {
 type Node struct {
 	Id int
 	Name string
+	X int
+	Y int
+	Z int
 	ExtraJSONBytes []byte
 	ExtraJSON []interface{}
 }
@@ -34,6 +37,8 @@ type Connection struct {
 	Name string
 	Source int
 	Target int
+	Distance float64
+	DistanceMultiplier float64
 }
 
 var db_filename string = "ALLTHEDATA.json"
