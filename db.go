@@ -42,13 +42,72 @@ type Connection struct {
 	DistanceMultiplier float64
 }
 
+type PathStep struct {
+	GScore float64
+	HScore float64
+	FScore float64
+	NodeId int
+	ParentNodeId int
+}
+
+func (p *PathStep) GetAdjacentNodes() []Node {
+	return getAdjacentNodes(p.NodeId)
+}
+
+func (p *PathStep) RecalcFScore() {
+	p.FScore = p.GScore + p.HScore
+}
+
+func (p *PathStep) RecalcHScore( destNodeId int ) {
+	p.HScore = getDistanceBetweenNodes(p.NodeId, destNodeId)
+}
+
+func getLowestFScore(path []PathStep) (step PathStep) {
+	notSetYet := true
+	for _, tmpStep := range path {
+		if notSetYet || tmpStep.FScore < step.FScore {
+			step = tmpStep
+			if notSetYet { notSetYet = false }
+		}
+	}
+	return
+}
+
+func removeFromPath(needle PathStep, haystack []PathStep) (newPath []PathStep) {
+	thekey := -1
+	for key, value := range haystack {
+		if value == needle {
+			thekey = key
+		}
+	}
+	// look at all of this bullshit we have to do because of memory management
+	if thekey > -1 {
+		if thekey == 0 {
+			lastPartOfSlice := haystack[1:] // copy everything AFTER the node
+			for _, value := range lastPartOfSlice {
+				newPath = append(newPath, value)
+			}
+		} else {
+			firstPartOfSlice := haystack[:thekey]
+			copy(newPath, firstPartOfSlice) // copy everything BEFORE the node
+			theNextKey := thekey + 1
+			lastPartOfSlice := haystack[theNextKey:] // copy everything AFTER the node
+			for _, value := range lastPartOfSlice {
+				newPath = append(newPath, value)
+			}
+		}
+		return newPath
+	} else {
+		// not found -- send haystack back unchanged
+		return haystack
+	}
+}
+
 var db_filename string = "ALLTHEDATA.json"
 var theData AllTheData
 
 func main() {
-	
-	theData.Name = "The Graph Database"
-	
+		
 	fmt.Println("Oh dear, a graph database...")
 	
 	// if the database file exists, load it
