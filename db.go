@@ -723,7 +723,7 @@ func deleteNodeFromSlice(needle Node, haystack []Node) (newSlice []Node) {
 func deleteConnectionFromSlice(needle Connection, haystack []Connection) (newSlice []Connection) {
 	thekey := -1
 	for key, value := range haystack {
-		if value == needle {
+		if value.Id == needle.Id {
 			thekey = key
 		}
 	}
