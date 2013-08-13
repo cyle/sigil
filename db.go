@@ -266,9 +266,12 @@ func (serv GraphService) DeleteNodeHandler(Id int) {
 	theData.Nodes = deleteNodeFromSlice(tmpNode, theData.Nodes)
 	fmt.Println("Node deleted")
 	
-	
 	// also delete any connections that were connected to the node
-	
+	for _, conn := range theData.Connections {
+		if conn.Source == Id || conn.Target == Id {
+			theData.Connections = deleteConnectionFromSlice(conn, theData.Connections)
+		}
+	}
 	
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
