@@ -29,7 +29,6 @@ type Node struct {
 	X int
 	Y int
 	Z int
-	ExtraJSONBytes []byte
 	ExtraJSON []interface{}
 }
 
@@ -40,6 +39,7 @@ type Connection struct {
 	Target int
 	Distance float64
 	DistanceMultiplier float64
+	ExtraJSON []interface{}
 }
 
 type PathStep struct {
@@ -376,7 +376,7 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 	// does not exist! create a new connection.
 	fmt.Println("Creating new connection based on input")
 	c.Id = len(theData.Connections) + 1 // +1 because it's 1-based instead of 0-based
-	c.Distance = getDistanceBetweenNodes(c.Source, c.Target)
+	c.Distance = getDistanceBetweenNodes(c.Source, c.Target) // make sure distance is set
 	theData.Connections = append(theData.Connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
