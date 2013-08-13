@@ -168,10 +168,8 @@ type GraphService struct{
 	
 	// paths stuff
 	getDistanceBetweenNodesHandler gorest.EndPoint `method:"GET" path:"/distance/from/{Source:int}/to/{Target:int}" output:"string"`
-	getAstarBetweenNodes gorest.EndPoint `method:"GET" path:"/astar/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
-	getPathBetweenNodes gorest.EndPoint `method:"GET" path:"/path/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
 	//getPathsBetweenNodes gorest.EndPoint `method:"GET" path:"/paths/from/{Source:int}/to/{Target:int}" output:"[][]Connection"`
-	getShortestPathBetweenNodes gorest.EndPoint `method:"GET" path:"/shortest/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
+	getAstarBetweenNodes gorest.EndPoint `method:"GET" path:"/shortest/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
 	
 	// save the database
 	saveDatabaseHandler gorest.EndPoint `method:"GET" path:"/save" output:"string"`
@@ -511,16 +509,21 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 					// this adjacent node is not yet in the open path list
 					//fmt.Println("Not yet in open path list, adding...")
 					tmpPathStep.GScore = currentPathStep.GScore + 1
+					//newHScore := getDistanceBetweenNodes(tmpPathStep.NodeId, Target)
+					//fmt.Printf("New HScore should be, from %d to %d: %f \n", tmpPathStep.NodeId, Target, newHScore)
 					tmpPathStep.RecalcHScore(Target)
 					tmpPathStep.RecalcFScore()
+					//fmt.Printf("Added to open path list: %+v \n", tmpPathStep)
 					openPathList = append(openPathList, tmpPathStep)
 				} else {
 					//fmt.Println("Already in open list, checking it out...")
 					// this adjacent node is already in the open path list
+					//fmt.Printf("Checking out: %+v \n", tmpPathStep)
 					if tmpPathStep.GScore > currentPathStep.GScore + 1 {
 						//fmt.Println("It's better, go there!")
 						tmpPathStep.GScore = currentPathStep.GScore + 1
 						tmpPathStep.RecalcFScore()
+						
 					}
 				}
 			}
@@ -528,17 +531,19 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 	}
 	
 	//fmt.Printf("Closed path list: %+v \n", closedPathList)
+	
 	//for _, val := range closedPathList {
 	//	fmt.Printf("Going to %d from %d \n", val.NodeId, val.ParentNodeId)
 	//}
 	
 	reverseFinalPath := []int{}
+	nextNodeId := 0
 	for i := len(closedPathList) - 1; i >= 0; i-- {
-		if i == len(closedPathList) - 1 {
+		if i == len(closedPathList) - 1 || nextNodeId == closedPathList[i].NodeId {
 			reverseFinalPath = append(reverseFinalPath, closedPathList[i].NodeId)
+			nextNodeId = closedPathList[i].ParentNodeId
 		}
-		reverseFinalPath = append(reverseFinalPath, closedPathList[i].ParentNodeId)
-		if closedPathList[i].ParentNodeId == Source {
+		if closedPathList[i].NodeId == Source {
 			break
 		}
 	}
@@ -550,73 +555,13 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 	
 	fmt.Printf("Final list: %+v \n", finalPath)
 	
-	// need:
-	// open list with nodes and their H and G scores
-	// AstarNode { properties: hScore, gScore, parentNode; methods: fScore, adjacentNodes, calcHScore }
-	// OpenList is a slice of these AstarNodes
-	// closedList is just a slice of Node ID ints
-	// method to get node in open list with lowest F score (which is H + G)
-	// method to get adjacent nodes (already have that)
-	// method to get "parent" node in working set
-	
-	return
-}
-
-func (serv GraphService) GetPathBetweenNodes(Source int, Target int) (connections []Connection) {
-	fmt.Printf("Get a connection path between nodes %d and %d \n", Source, Target)
-	
-	// trying: http://en.wikipedia.org/wiki/Graph_traversal
-	
-	tries := 0
-	
-	foundTarget := false
-	
-	nodeQueue := make([]int, 1)
-	nodeQueue[0] = Source
-
-	nodeMarked := make([]int, 1)
-	nodeMarked[0] = Source
-	
-	for len(nodeQueue) != 0 {
-		//fmt.Printf("Queue looks like: %+v \n", nodeQueue)
-		//fmt.Printf("List of marked nodes looks like: %+v \n", nodeMarked)
-		if tries > 100 { break }
-		tmpNode := nodeQueue[0] // take first element
-		nodeQueue = nodeQueue[1:] // remove first element
-		//fmt.Printf("current node is %d \n", tmpNode)
-		if tmpNode == Target {
-			foundTarget = true
-			break
-		} else {
-			//fmt.Println("not directly connected, getting connections...")
-			for _, conn := range theData.Connections {
-				if conn.Source == tmpNode || conn.Target == tmpNode {
-					nextNode := 0
-					if (conn.Source == tmpNode) {
-						nextNode = conn.Target
-					} else {
-						nextNode = conn.Source
-					}
-					//fmt.Printf("seeing if %d is marked... \n", nextNode)
-					if doesIntExist(nextNode, nodeMarked) == false {
-						nodeMarked = append(nodeMarked, nextNode)
-						nodeQueue = append(nodeQueue, nextNode)
-						//fmt.Println("not marked, going deeper...")
-					} else {
-						//fmt.Println("marked, skipping along")
-					}
-				}
+	// get the connections that make up this path
+	for i := 0; i < len(finalPath) - 1; i++ {
+		for _, conn := range theData.Connections {
+			if (conn.Source == finalPath[i] && conn.Target == finalPath[i+1]) || (conn.Source == finalPath[i+1] && conn.Target == finalPath[i]) {
+				connections = append(connections, conn)
 			}
 		}
-		tries += 1
-	}
-	
-	if foundTarget {
-		fmt.Printf("found the target, took %d iterations! \n", tries)
-		fmt.Printf("final list of queued nodes: %+v \n", nodeQueue)
-		fmt.Printf("final list of marked nodes: %+v \n", nodeMarked)
-	} else {
-		fmt.Println("could not find route to target within 200 iterations")
 	}
 	
 	return
