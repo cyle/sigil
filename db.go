@@ -483,38 +483,38 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 	
 	for len(openPathList) > 0 {
 		currentPathStep := getLowestFScore(openPathList)
-		fmt.Printf("Current node ID: %d \n", currentPathStep.NodeId)
+		//fmt.Printf("Current node ID: %d \n", currentPathStep.NodeId)
 		closedPathList = append(closedPathList, currentPathStep)
 		openPathList = removeFromPath(currentPathStep, openPathList)
 		if doesPathExistAlready(lastPathStep, closedPathList) {
 			// we just added the destination! we're done!
-			fmt.Println("Destination found! All done!")
+			//fmt.Println("Destination found! All done!")
 			break
 		} else {
 			// get adjacent paths
 			adjacentNodes := currentPathStep.GetAdjacentNodes();
 			//fmt.Println("Going through adjacent nodes...")
 			for _, tmpNode := range adjacentNodes {
-				fmt.Printf("Checking adjacent node ID: %d \n", tmpNode.Id)
+				//fmt.Printf("Checking adjacent node ID: %d \n", tmpNode.Id)
 				tmpPathStep := PathStep{}
 				tmpPathStep.NodeId = tmpNode.Id
 				tmpPathStep.ParentNodeId = currentPathStep.NodeId
 				if doesPathExistAlready(tmpPathStep, closedPathList) {
-					fmt.Println("Already been here, continuing...")
+					//fmt.Println("Already been here, continuing...")
 					continue // keep going if we've already been there
 				}
 				if doesPathExistAlready(tmpPathStep, openPathList) == false {
 					// this adjacent node is not yet in the open path list
-					fmt.Println("Not yet in open path list, adding...")
+					//fmt.Println("Not yet in open path list, adding...")
 					tmpPathStep.GScore = currentPathStep.GScore + 1
 					tmpPathStep.RecalcHScore(Target)
 					tmpPathStep.RecalcFScore()
 					openPathList = append(openPathList, tmpPathStep)
 				} else {
-					fmt.Println("Already in open list, checking it out...")
+					//fmt.Println("Already in open list, checking it out...")
 					// this adjacent node is already in the open path list
 					if tmpPathStep.GScore > currentPathStep.GScore + 1 {
-						fmt.Println("It's better, go there!")
+						//fmt.Println("It's better, go there!")
 						tmpPathStep.GScore = currentPathStep.GScore + 1
 						tmpPathStep.RecalcFScore()
 					}
@@ -523,7 +523,28 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 		}
 	}
 	
-	fmt.Printf("Closed path list: %+v \n", closedPathList)
+	//fmt.Printf("Closed path list: %+v \n", closedPathList)
+	//for _, val := range closedPathList {
+	//	fmt.Printf("Going to %d from %d \n", val.NodeId, val.ParentNodeId)
+	//}
+	
+	reverseFinalPath := []int{}
+	for i := len(closedPathList) - 1; i >= 0; i-- {
+		if i == len(closedPathList) - 1 {
+			reverseFinalPath = append(reverseFinalPath, closedPathList[i].NodeId)
+		}
+		reverseFinalPath = append(reverseFinalPath, closedPathList[i].ParentNodeId)
+		if closedPathList[i].ParentNodeId == Source {
+			break
+		}
+	}
+	
+	finalPath := []int{}
+	for i := len(reverseFinalPath) - 1; i >= 0; i-- {
+		finalPath = append(finalPath, reverseFinalPath[i])
+	}
+	
+	fmt.Printf("Final list: %+v \n", finalPath)
 	
 	// need:
 	// open list with nodes and their H and G scores
