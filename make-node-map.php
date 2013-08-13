@@ -61,7 +61,6 @@ $nodes[] = array( 'Id' => 14, 'Name' => 'Node 14', 'X' => 4, 'Y' => 13);
 // give them all the extra zero'd-out stuff
 for ($i = 0; $i < count($nodes); $i++) {
 	$nodes[$i]['Z'] = 0.0;
-	$nodes[$i]['ExtraJSONBytes'] = null;
 	$nodes[$i]['ExtraJSON'] = null;
 }
 
@@ -125,6 +124,7 @@ for ($i = 0; $i < count($connections); $i++) {
 // give them all the extra zero'd-out stuff
 for ($i = 0; $i < count($connections); $i++) {
 	$connections[$i]['DistanceMultiplier'] = null;
+	$connections[$i]['ExtraJSON'] = null;
 }
 
 //$thedata['Connections'] = $nodes;
