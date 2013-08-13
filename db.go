@@ -12,6 +12,7 @@ import "net/http"
 import "os"
 import "io/ioutil"
 import "bufio"
+import "runtime"
 import "encoding/json" // documentation: http://golang.org/pkg/encoding/json/
 
 // using gorest: https://code.google.com/p/gorest/wiki/GettingStarted?tm=6
@@ -173,6 +174,9 @@ type GraphService struct{
 	
 	// save the database
 	saveDatabaseHandler gorest.EndPoint `method:"GET" path:"/save" output:"string"`
+	
+	// get memory info
+	memoryInfoHandler gorest.EndPoint `method:"GET" path:"/meminfo" output:"string"`
 }
 
 func (serv GraphService) RootHandler() string {
@@ -184,6 +188,13 @@ func (serv GraphService) SaveDatabaseHandler() string {
 	saveAllTheData();
 	fmt.Println("Saved database to file")
 	return "okay"
+}
+
+func (serv GraphService) MemoryInfoHandler() (memstring string) {
+	memstats := new(runtime.MemStats)
+	runtime.ReadMemStats(memstats)
+	memstring = fmt.Sprintf("Bytes Allocated: %d; Bytes Reserved from System: %d\nMegabytes Allocated: %f; Megabytes Reserved from System: %f", memstats.Alloc, memstats.Sys, float32(memstats.Alloc)/1024/1024, float32(memstats.Sys)/1024/1024)
+	return 
 }
 
 /*
