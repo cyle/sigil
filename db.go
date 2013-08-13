@@ -397,6 +397,10 @@ func (serv GraphService) DeleteConnectionHandler(Id int) {
 
 func getDistanceBetweenNodes(Source int, Target int) (distance float64) {
 
+	if Source == Target {
+		return 0.0
+	}
+	
 	var x1 int
 	var y1 int
 	var z1 int
