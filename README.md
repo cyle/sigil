@@ -1,8 +1,10 @@
-# simple graph database
+# simple graph and spatial database
 
 Version: 0.1
 
 This is supposed to be just a very simple graph database, accessible via a REST interface.
+
+And I've decided to add some spatial features to it.
 
 ## warning
 
@@ -38,9 +40,17 @@ That should be it for installing things. Now to run this database:
 
 That's it... go to `http://localhost:8777/` to see if it's working. That'll be your API endpoint.
 
+## populate it with a demo database
+
+If you have the PHP CLI installed, you can run:
+
+    php make-node-map.php
+
+which will populate the database with a simple test graph. To save it, go to a browser and hit `http://localhost:8777/save`
+
 ## API documentation
 
-To use the graph database in an application, visit the [API doc](API.md).
+To use the graph database in an application, visit the [API doc](API.md). Please note that I'll probably be updating this database faster than the API documentation.
 
 ## ideas / lists
 

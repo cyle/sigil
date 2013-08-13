@@ -1,5 +1,9 @@
 # The Simple Graph Database REST API
 
+## Consider the Following
+
+This document is probably not accurate while I'm developing the database.
+
 ## Querying
 
 To get all nodes, simply send a GET request to `/nodes`.
