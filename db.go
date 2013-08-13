@@ -240,47 +240,20 @@ func (serv GraphService) PostNodeHandler(n Node) {
 
 func (serv GraphService) DeleteNodeHandler(Id int) {
 	fmt.Printf("Trying to delete node ID %d \n", Id)
-	thekey := -1
-	for key, value := range theData.Nodes {
+	tmpNode := Node{}
+	for _, value := range theData.Nodes {
 		if value.Id == Id {
-			thekey = key
+			tmpNode = value
+			break
 		}
 	}
-	// look at all of this bullshit we have to do because of memory management
-	if thekey > -1 {
-		//fmt.Printf("Found the node to delete: %d \n", thekey)
-		var tmpWhatever []Node
-		if thekey == 0 {
-			tmpWhatever = make([]Node, len(theData.Nodes) - 1)
-			lastPartOfSlice := theData.Nodes[1:] // copy everything AFTER the node
-			for _, value := range lastPartOfSlice {
-				//fmt.Printf("Copying node: %+v \n", value)
-				tmpWhatever = append(tmpWhatever, value)
-			}
-		} else {
-			tmpWhatever = make([]Node, thekey)
-			firstPartOfSlice := theData.Nodes[:thekey]
-			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE the node
-			//fmt.Printf("Nodes so far: %+v \n", tmpWhatever)
-			theNextKey := thekey + 1
-			lastPartOfSlice := theData.Nodes[theNextKey:] // copy everything AFTER the node
-			for _, value := range lastPartOfSlice {
-				//fmt.Printf("Copying node: %+v \n", value)
-				tmpWhatever = append(tmpWhatever, value)
-			}
-		}
-		//fmt.Printf("Nodes so far: %+v \n", tmpWhatever)
-		theData.Nodes = tmpWhatever
-		//fmt.Printf("Nodes should be copied now!\n")
-		fmt.Println("Node deleted")
-		
-		
-		// also delete any connections that were connected to the node
-		
-		
-	} else {
-		fmt.Println("Could not find that node ID to delete, weird")
-	}
+	theData.Nodes = deleteNodeFromSlice(tmpNode, theData.Nodes)
+	fmt.Println("Node deleted")
+	
+	
+	// also delete any connections that were connected to the node
+	
+	
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
 }
@@ -385,35 +358,15 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 
 func (serv GraphService) DeleteConnectionHandler(Id int) {
 	fmt.Printf("Trying to delete connection ID %d", Id)
-	thekey := -1
-	for key, value := range theData.Connections {
+	tmpConn := Connection{}
+	for _, value := range theData.Connections {
 		if value.Id == Id {
-			thekey = key
+			tmpConn = value
+			break
 		}
 	}
-	if thekey > -1 {
-		var tmpWhatever []Connection
-		if thekey == 0 {
-			tmpWhatever = make([]Connection, len(theData.Connections) - 1)
-			lastPartOfSlice := theData.Connections[1:] // copy everything AFTER
-			for _, value := range lastPartOfSlice {
-				tmpWhatever = append(tmpWhatever, value)
-			}
-		} else {
-			tmpWhatever = make([]Connection, thekey)
-			firstPartOfSlice := theData.Connections[:thekey]
-			copy(tmpWhatever, firstPartOfSlice) // copy everything BEFORE
-			theNextKey := thekey + 1
-			lastPartOfSlice := theData.Connections[theNextKey:] // copy everything AFTER
-			for _, value := range lastPartOfSlice {
-				tmpWhatever = append(tmpWhatever, value)
-			}
-		}
-		theData.Connections = tmpWhatever
-		fmt.Println("Connection deleted")
-	} else {
-		fmt.Println("Could not find that connection ID to delete, weird")
-	}
+	theData.Connections = deleteConnectionFromSlice(tmpConn, theData.Connections)
+	fmt.Println("Deleted connection")
 	serv.ResponseBuilder().SetResponseCode(200)
 	return
 }
@@ -647,4 +600,100 @@ func doesIntExist(needle int, haystack []int) bool {
 		}
 	}
 	return false
+}
+
+// removes a string from a slice
+func deleteStringFromSlice(needle string, haystack []string) (newSlice []string) {
+	thekey := -1
+	for key, value := range haystack {
+		if value == needle {
+			thekey = key
+		}
+	}
+	if thekey > -1 {
+		if thekey == 0 {
+			lastPartOfSlice := haystack[1:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				newSlice = append(newSlice, value)
+			}
+		} else {
+			firstPartOfSlice := haystack[:thekey]
+			copy(newSlice, firstPartOfSlice) // copy everything BEFORE
+			theNextKey := thekey + 1
+			lastPartOfSlice := haystack[theNextKey:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				newSlice = append(newSlice, value)
+			}
+		}
+		// deleted
+		return newSlice
+	} else {
+		// could not find it in the slice, return original
+		return haystack
+	}
+	return
+}
+
+
+// removes a node from a slice
+func deleteNodeFromSlice(needle Node, haystack []Node) (newSlice []Node) {
+	thekey := -1
+	for key, value := range haystack {
+		if value.Id == needle.Id {
+			thekey = key
+		}
+	}
+	if thekey > -1 {
+		if thekey == 0 {
+			lastPartOfSlice := haystack[1:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				newSlice = append(newSlice, value)
+			}
+		} else {
+			firstPartOfSlice := haystack[:thekey]
+			copy(newSlice, firstPartOfSlice) // copy everything BEFORE
+			theNextKey := thekey + 1
+			lastPartOfSlice := haystack[theNextKey:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				newSlice = append(newSlice, value)
+			}
+		}
+		// deleted
+		return newSlice
+	} else {
+		// could not find it in the slice, return original
+		return haystack
+	}
+	return
+}
+
+// removes a connection from a slice
+func deleteConnectionFromSlice(needle Connection, haystack []Connection) (newSlice []Connection) {
+	thekey := -1
+	for key, value := range haystack {
+		if value == needle {
+			thekey = key
+		}
+	}
+	if thekey > -1 {
+		if thekey == 0 {
+			lastPartOfSlice := haystack[1:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				newSlice = append(newSlice, value)
+			}
+		} else {
+			firstPartOfSlice := haystack[:thekey]
+			copy(newSlice, firstPartOfSlice) // copy everything BEFORE
+			theNextKey := thekey + 1
+			lastPartOfSlice := haystack[theNextKey:] // copy everything AFTER
+			for _, value := range lastPartOfSlice {
+				newSlice = append(newSlice, value)
+			}
+		}
+		// deleted
+		return newSlice
+	} else {
+		// could not find it in the slice, return original
+		return haystack
+	}
 }
