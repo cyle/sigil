@@ -358,10 +358,16 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 		serv.ResponseBuilder().SetResponseCode(400).Overide(true)
 		return
 	}
+	if c.Source == 0 || c.Target == 0 {
+		fmt.Println("Cannot create connection where SOURCE or TARGET are zero")
+		serv.ResponseBuilder().SetResponseCode(400).Overide(true)
+		return
+	}
 	// check to see if connection already exists
 	for key, value := range theData.Connections {
 		if value.Id == c.Id {
 			fmt.Printf("Updating connection ID %d \n", c.Id)
+			c.Distance = getDistanceBetweenNodes(c.Source, c.Target) // update distance
 			theData.Connections[key] = c
 			serv.ResponseBuilder().SetResponseCode(200)
 			return
@@ -370,6 +376,7 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 	// does not exist! create a new connection.
 	fmt.Println("Creating new connection based on input")
 	c.Id = len(theData.Connections) + 1 // +1 because it's 1-based instead of 0-based
+	c.Distance = getDistanceBetweenNodes(c.Source, c.Target)
 	theData.Connections = append(theData.Connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
