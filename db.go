@@ -180,7 +180,7 @@ type GraphService struct{
 }
 
 func (serv GraphService) RootHandler() string {
-	return "Simple Graph Database, v0.1"
+	return "SIGIL, v0.1"
 }
 
 func (serv GraphService) SaveDatabaseHandler() string {
