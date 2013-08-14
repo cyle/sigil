@@ -10,10 +10,12 @@ This is still in very, very early development. It's not really usable yet in any
 
 ## how to use
 
+**Note:** these instructions were written with the intention of being used on a Mac via Terminal, or on a Debian/Ubuntu box via Bash. I don't yet know how to do all of this on Windows.
+
 First, set up your Go working directory:
 
-    mkdir simple-graph-database
-    cd simple-graph-database
+    mkdir sigil
+    cd sigil
 
 Next, set your $GOPATH to this working directory (you'll need this to install the `gorest` package later):
 
@@ -25,7 +27,7 @@ Next, create the necessary working directory subdirectories (based on the [how t
 
 Okay cool -- now clone in this repo to the `src/` directory:
 
-    git clone git@github.com:cyle/simple-graph-database.git src/
+    git clone git@github.com:cyle/sigil.git src/
 
 Right now this primarily relies on the `gorest` third-party package. To install it, do:
 
@@ -45,6 +47,10 @@ If you have the PHP CLI installed, you can run:
     php make-node-map.php
 
 which will populate the database with a simple test graph. To save it, go to a browser and hit `http://localhost:8777/save`
+
+## check out how the database looks
+
+If you have a web server with PHP running on your development box, you can put the `visualize.php` page somewhere and use that to get an HTML5 Canvas-drawn visualization of your graph database. (Adding 3D support with something like three.js may come someday.)
 
 ## API documentation
 
