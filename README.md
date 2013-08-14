@@ -1,10 +1,8 @@
-# simple graph and spatial database
+# SIGIL
 
-Version: 0.1
+A simple graph and spatial database, version 0.1.
 
-This is supposed to be just a very simple graph database, accessible via a REST interface.
-
-And I've decided to add some spatial features to it.
+This is supposed to be just a very simple database of graphs and spatial information, accessible via a REST interface.
 
 ## warning
 
@@ -103,6 +101,10 @@ backend stuff:
 - flush/save data to disk
 - load from disk on startup, if file exists
 
-## why?
+## why make this?
 
 I liked the ideas of neo4j but I hate Java. And I want to build something that needs a simple graph database component.
+
+## why "SIGIL"?
+
+I tried coming up with some kind of acronym for "simple graph and spatial database" (SGSDB? lame) and I just thought of calling it SIGIL instead. No reason other than that.

@@ -1,4 +1,4 @@
-# The Simple Graph Database REST API
+# The SIGIL REST API
 
 ## Consider the Following
 

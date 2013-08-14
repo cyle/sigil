@@ -1,6 +1,6 @@
 /*
 
-	cyle's simple graph database, version 0.1
+	cyle's SIGIL database, version 0.1
 
 */
 
