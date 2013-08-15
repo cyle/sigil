@@ -56,6 +56,12 @@ If you have a web server with PHP running on your development box, you can put t
 
 To use the graph database in an application, visit the [API doc](API.md). Please note that I'll probably be updating this database faster than the API documentation.
 
+## clients
+
+Currently, I have only written one client, and it's for PHP:
+
+- [sigil-php](https://github.com/cyle/sigil-php/)
+
 ## ideas / lists
 
 documents:
