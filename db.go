@@ -248,6 +248,7 @@ func (serv GraphService) GetNodeHandler(Id int) (n Node){
 
 func (serv GraphService) PostNodeHandler(n Node) {
 	fmt.Printf("Just got: %+v \n", n)
+	current_max_id := 0
 	// check if this already exists. if so, update it.
 	for key, value := range theData.Nodes {
 		if value.Id == n.Id {
@@ -256,10 +257,13 @@ func (serv GraphService) PostNodeHandler(n Node) {
 			serv.ResponseBuilder().SetResponseCode(200)
 			return
 		}
+		if value.Id > current_max_id {
+			current_max_id = value.Id
+		}
 	}
 	// doesn't exist? create it.
 	fmt.Println("Creating new node based on input")
-	n.Id = len(theData.Nodes) + 1 // +1 because it's 1-based instead of 0-based
+	n.Id = current_max_id + 1
 	theData.Nodes = append(theData.Nodes, n)
 	serv.ResponseBuilder().SetResponseCode(201)
 	return
@@ -375,6 +379,7 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 		return
 	}
 	// check to see if connection already exists
+	current_max_id := 0
 	for key, value := range theData.Connections {
 		if value.Id == c.Id {
 			fmt.Printf("Updating connection ID %d \n", c.Id)
@@ -383,10 +388,13 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 			serv.ResponseBuilder().SetResponseCode(200)
 			return
 		}
+		if value.Id > current_max_id {
+			current_max_id = value.Id
+		}
 	}
 	// does not exist! create a new connection.
 	fmt.Println("Creating new connection based on input")
-	c.Id = len(theData.Connections) + 1 // +1 because it's 1-based instead of 0-based
+	c.Id = current_max_id + 1
 	c.Distance = getDistanceBetweenNodes(c.Source, c.Target) // make sure distance is set
 	theData.Connections = append(theData.Connections, c)
 	serv.ResponseBuilder().SetResponseCode(201)
