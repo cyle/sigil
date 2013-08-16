@@ -63,13 +63,13 @@ To create a new node, send a POST request to `/node` with a JSON object with as 
 
     { "Name": "A name for your node" }
 
-A unique ID for your new node will be generated automatically, and the `X`, `Y`, and `Z` attributes will all be 0, and the `ExtraJSON` attribute will be `null`. You should get either a `201` HTTP status code on success or a `400` on rejection.
+A unique ID for your new node will be generated automatically, and the `X`, `Y`, and `Z` attributes will all be 0, and the `ExtraJSON` attribute will be `null`. You should get either a `201` HTTP status code on success or a `400` on rejection. When you receive a `201` back, you will get a `Location` header that has the URL to the new node ID.
 
 To create a new connection, send a POST request to `/connection` with a JSON object with as many of the above Connection-type attributes as you want. You **must** supply the `Source` and `Target` attributes, and they must not be the same. Any attributes left out will be zero'd or auto-filled. For example, if you send along:
 
     { "Name": "A name for your connection", "Source": 1, "Target": 2 }
 
-A unique ID for your new connection will be generated automatically, and the `Distance` attribute will be generated for you, and the `ExtraJSON` attribute will be `null`. You should get either a `201` HTTP status code on success or a `400` on rejection.
+A unique ID for your new connection will be generated automatically, and the `Distance` attribute will be generated for you, and the `ExtraJSON` attribute will be `null`. You should get either a `201` HTTP status code on success or a `400` on rejection. When you receive a `201` back, you will get a `Location` header that has the URL to the new connection ID.
 
 **Note:** At this time there is nothing stopping you from making multiple connections between the same two nodes, or putting two nodes "on top of" each other spatially. This may change in the future, I'm not sure yet. 
 

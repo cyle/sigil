@@ -265,7 +265,9 @@ func (serv GraphService) PostNodeHandler(n Node) {
 	fmt.Println("Creating new node based on input")
 	n.Id = current_max_id + 1
 	theData.Nodes = append(theData.Nodes, n)
-	serv.ResponseBuilder().SetResponseCode(201)
+	//serv.ResponseBuilder().SetResponseCode(201)
+	fmt.Printf("Created node ID %d \n", n.Id)
+	serv.ResponseBuilder().Created("http://localhost:8777/node/"+fmt.Sprintf("%d", n.Id))
 	return
 }
 
@@ -397,7 +399,9 @@ func (serv GraphService) PostConnectionHandler(c Connection) {
 	c.Id = current_max_id + 1
 	c.Distance = getDistanceBetweenNodes(c.Source, c.Target) // make sure distance is set
 	theData.Connections = append(theData.Connections, c)
-	serv.ResponseBuilder().SetResponseCode(201)
+	//serv.ResponseBuilder().SetResponseCode(201)
+	fmt.Printf("Created connection ID %d \n", c.Id)
+	serv.ResponseBuilder().Created("http://localhost:8777/connection/"+fmt.Sprintf("%d", c.Id))
 	return
 }
 
