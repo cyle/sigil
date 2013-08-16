@@ -30,7 +30,7 @@ type Node struct {
 	X int
 	Y int
 	Z int
-	ExtraJSON []interface{}
+	ExtraJSON map[string]string
 }
 
 type Connection struct {
@@ -40,7 +40,7 @@ type Connection struct {
 	Target int
 	Distance float64
 	DistanceMultiplier float64
-	ExtraJSON []interface{}
+	ExtraJSON map[string]string
 }
 
 type PathStep struct {
