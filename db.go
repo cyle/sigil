@@ -224,6 +224,11 @@ func (serv GraphService) GetNodeHandler(Id int) (n Node){
 	
 	n = getNode(Id)
 	
+	if n.Id == 0 { // could not find it
+		serv.ResponseBuilder().SetResponseCode(404).Overide(true)  //Overide causes the entity returned by the method to be ignored. Other wise it would send back zeroed object
+	    return
+	}
+	
 	fmt.Printf("Giving: %+v \n", n)
 	
 	/*
@@ -242,7 +247,6 @@ func (serv GraphService) GetNodeHandler(Id int) (n Node){
 	*/
 	
 	// could not find it! send 404
-    serv.ResponseBuilder().SetResponseCode(404).Overide(true)  //Overide causes the entity returned by the method to be ignored. Other wise it would send back zeroed object
     return
 }
 
