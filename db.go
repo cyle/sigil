@@ -175,8 +175,10 @@ type GraphService struct{
 	getNearbyNodes gorest.EndPoint `method:"GET" path:"/nodes/nearby/{Source:int}/radius/{Radius:float64}" output:"[]Node"`
 	getClosestNode gorest.EndPoint `method:"GET" path:"/node/closest/{Source:int}" output:"Node"`
 	
-	// save the database
+	// database-wide operations
 	saveDatabaseHandler gorest.EndPoint `method:"GET" path:"/save" output:"string"`
+	deleteAllNodes gorest.EndPoint `method:"DELETE" path:"/nodes"`
+	deleteAllConnections gorest.EndPoint `method:"DELETE" path:"/connections"`
 	
 	// get memory info
 	memoryInfoHandler gorest.EndPoint `method:"GET" path:"/meminfo" output:"string"`
@@ -191,6 +193,20 @@ func (serv GraphService) SaveDatabaseHandler() string {
 	saveAllTheData();
 	fmt.Println("Saved database to file")
 	return "okay"
+}
+
+func (serv GraphService) DeleteAllNodes() {
+	fmt.Println("Deleting all nodes...")
+	theData.Nodes = make([]Node, 0)
+	// also deletes all connections
+	theService.DeleteAllConnections()
+	return
+}
+
+func (serv GraphService) DeleteAllConnections() {
+	fmt.Println("Deleting all connections...")
+	theData.Connections = make([]Connection, 0)
+	return
 }
 
 func (serv GraphService) MemoryInfoHandler() (memstring string) {

@@ -101,6 +101,10 @@ You can delete a node by sending a DELETE request to `/node/:id` where `:id` is 
 
 You can delete a connection by sending a DELETE request to `/connection/:id` where `:id` is the unique connection ID you'd like to have deleted.
 
+You can delete every single node and connection by sending a DELETE request to `/nodes`.
+
+You can delete every single connection (but leave nodes intact) by sending a DELETE request to `/connections`.
+
 ## Saving
 
 You can save the current database to disk by sending a GET request to `/save`, you should get an "okay" in return.
