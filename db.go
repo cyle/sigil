@@ -123,6 +123,7 @@ func removeFromPath(needle PathStep, haystack []PathStep) (newPath []PathStep) {
 
 var db_filename string = "ALLTHEDATA.json"
 var theData AllTheData
+var theService GraphService
 
 func main() {
 		
@@ -140,7 +141,7 @@ func main() {
 	}
 		
 	// start the REST service to access the data
-	gorest.RegisterService(new(GraphService))
+	gorest.RegisterService(&theService)
 	http.Handle("/", gorest.Handle())    
 	http.ListenAndServe(":8777", nil)
 }
