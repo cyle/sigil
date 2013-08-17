@@ -142,7 +142,7 @@ if (is_array($conns)) {
 <?php
 foreach ($nodes as $node) {
 	echo 'a.beginPath();'."\n";
-	echo 'a.arc('.($node['X'] * $grid_scale).', '.($node['Y'] * $grid_scale).', 10, 0, 2 * Math.PI, false);'."\n";
+	echo 'a.arc('.($node['X'] * $grid_scale).', '.($node['Y'] * $grid_scale).', 5, 0, 2 * Math.PI, false);'."\n";
 	echo 'a.fillStyle = "#aaa";'."\n"; // fill of the node itself
 	echo 'a.fill();'."\n";
 	echo 'a.closePath();'."\n";
