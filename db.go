@@ -172,6 +172,7 @@ type GraphService struct{
 	//getPathsBetweenNodes gorest.EndPoint `method:"GET" path:"/paths/from/{Source:int}/to/{Target:int}" output:"[][]Connection"`
 	getAstarBetweenNodes gorest.EndPoint `method:"GET" path:"/shortest/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
 	getNearbyNodes gorest.EndPoint `method:"GET" path:"/nodes/nearby/{Source:int}/radius/{Radius:float64}" output:"[]Node"`
+	getClosestNode gorest.EndPoint `method:"GET" path:"/node/closest/{Source:int}" output:"Node"`
 	
 	// save the database
 	saveDatabaseHandler gorest.EndPoint `method:"GET" path:"/save" output:"string"`
@@ -623,6 +624,25 @@ func (serv GraphService) GetNearbyNodes(Source int, Radius float64) (nodes []Nod
 			if getDistanceBetweenNodes(node.Id, Source) <= Radius {
 				nodes = append(nodes, node)
 			}
+		}
+	}
+	
+	return
+}
+
+func (serv GraphService) GetClosestNode(Source int) (n Node) {
+	// get nodes that are within X of source node
+	
+	var shortestDistance float64
+	
+	for _, node := range theData.Nodes {
+		if node.Id == Source {
+			continue
+		}
+		distance := getDistanceBetweenNodes(Source, node.Id)
+		if distance < shortestDistance || shortestDistance == 0.0 {
+			shortestDistance = distance
+			n = node
 		}
 	}
 	
