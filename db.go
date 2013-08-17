@@ -620,6 +620,18 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 		}
 	}
 	
+	// make sure the destination is in the list. if not, 404
+	foundTarget := false
+	for _, conn := range connections {
+		if conn.Target == Target || conn.Source == Target {
+			foundTarget = true
+		}
+	}
+	
+	if foundTarget == false {
+		serv.ResponseBuilder().SetResponseCode(404).Overide(true)
+	}
+	
 	return
 }
 

@@ -53,7 +53,7 @@ To get all connections attached to a given node, simply send a GET request to `/
 
 To get all nodes adjacent/connected to a given node, simply send a GET request to `/node/:id/adjacent`, where `:id` is the unique ID number of the node you want adjacent nodes for. This will return a `200` HTTP status code and a JSON list of nodes.
 
-To get the shortest path between two nodes, simply send a GET request to `/shortest/from/:source/to/:target`, where `:source` is the origin node unique ID and `:target` is the destination node unique ID. This will return a `200` HTTP status code and a JSON list of connections, from the source to the target.
+To get the shortest path between two nodes, simply send a GET request to `/shortest/from/:source/to/:target`, where `:source` is the origin node unique ID and `:target` is the destination node unique ID. This will return a `200` HTTP status code and a JSON list of connections, from the source to the target. If there is no path between the two nodes, it will return a `404` HTTP status code.
 
 To get the straight basic Euclidean distance between two nodes, simply send a GET request to `/distance/from/:source/to/:target`, where `:source` is the origin node unique ID and `:target` is the destination node unique ID. This will return a `200` HTTP status code and a floating point number representing the distance.
 
