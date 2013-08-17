@@ -167,10 +167,11 @@ type GraphService struct{
 	postConnectionHandler gorest.EndPoint `method:"POST" path:"/connection" postdata:"Connection"`
 	deleteConnectionHandler gorest.EndPoint `method:"DELETE" path:"/connection/{Id:int}"`
 	
-	// paths stuff
+	// path/spatial stuff
 	getDistanceBetweenNodesHandler gorest.EndPoint `method:"GET" path:"/distance/from/{Source:int}/to/{Target:int}" output:"string"`
 	//getPathsBetweenNodes gorest.EndPoint `method:"GET" path:"/paths/from/{Source:int}/to/{Target:int}" output:"[][]Connection"`
 	getAstarBetweenNodes gorest.EndPoint `method:"GET" path:"/shortest/from/{Source:int}/to/{Target:int}" output:"[]Connection"`
+	getNearbyNodes gorest.EndPoint `method:"GET" path:"/nodes/nearby/{Source:int}/radius/{Radius:float64}" output:"[]Node"`
 	
 	// save the database
 	saveDatabaseHandler gorest.EndPoint `method:"GET" path:"/save" output:"string"`
@@ -604,6 +605,31 @@ func (serv GraphService) GetAstarBetweenNodes(Source int, Target int) (connectio
 	return
 }
 
+func (serv GraphService) GetNearbyNodes(Source int, Radius float64) (nodes []Node) {
+	// get nodes that are within X of source node
+	
+	sourceNode := getNode(Source)
+	boundMinX := float64(sourceNode.X) - Radius
+	boundMinY := float64(sourceNode.Y) - Radius
+	boundMaxX := float64(sourceNode.X) + Radius
+	boundMaxY := float64(sourceNode.Y) + Radius
+	
+	for _, node := range theData.Nodes {
+		if node.Id == Source {
+			continue
+		}
+		if float64(node.X) < boundMaxX && float64(node.X) > boundMinX && float64(node.Y) < boundMaxY && float64(node.Y) > boundMinY {
+			// it might be within the radius
+			if getDistanceBetweenNodes(node.Id, Source) <= Radius {
+				nodes = append(nodes, node)
+			}
+		}
+	}
+	
+	return
+}
+
+/*
 func (serv GraphService) GetPathsBetweenNodes(Source int, Target int) (paths [][]Connection) {
 	fmt.Printf("Get connection paths between nodes %d and %d \n", Source, Target)
 	
@@ -614,13 +640,7 @@ func (serv GraphService) GetPathsBetweenNodes(Source int, Target int) (paths [][
 	
 	return paths
 }
-
-func (serv GraphService) GetShortestPathBetweenNodes(Source int, Target int) (connections []Connection) {
-	fmt.Printf("Get shortest connection path between nodes %d and %d \n", Source, Target)
-	// run GetPathsBetweenNodes and just pick the shortest one and send along the list of connections
-	
-	return
-}
+*/
 
 /*
 

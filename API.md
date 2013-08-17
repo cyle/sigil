@@ -57,6 +57,8 @@ To get the shortest path between two nodes, simply send a GET request to `/short
 
 To get the straight basic Euclidean distance between two nodes, simply send a GET request to `/distance/from/:source/to/:target`, where `:source` is the origin node unique ID and `:target` is the destination node unique ID. This will return a `200` HTTP status code and a floating point number representing the distance.
 
+To get a list of nodes within a certain radius of a node, simply send a GET request to `/nodes/nearby/:source/radius/:r`, where `:source` is the origin node unique ID and `:r` is the radius (int or float number) you would like to search within. On success, this will return a `200` HTTP status code and an array of nodes. If no nodes are found within the radius, it will return a `200` HTTP status code and `null`.
+
 ## Creating
 
 To create a new node, send a POST request to `/node` with a JSON object with as many of the above Node-type attributes as you want. Any attributes left out will be zero'd. For example, if you send along:
