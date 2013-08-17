@@ -40,6 +40,9 @@ if (databaseCall('/') == '') {
 
 // ok -- get stuff
 $nodes = databaseCall('/nodes', null, false);
+if (!is_array($nodes)) {
+	die('no nodes to show');
+}
 $conns = databaseCall('/connections', null, false);
 
 ?>
@@ -122,14 +125,16 @@ for (var y = 0.5; y < <?php echo $actual_grid_height; ?>; y += <?php echo $grid_
 a.strokeStyle = "#900";
 a.lineWidth = 2;
 <?php
-foreach ($conns as $conn) {
-	$source_coords = getNodeCoords($conn['Source']);
-	$target_coords = getNodeCoords($conn['Target']);
-	echo 'a.beginPath();'."\n";
-	echo 'a.moveTo('.($source_coords['X'] * $grid_scale).', '.($source_coords['Y'] * $grid_scale).');'."\n"; // source
-	echo 'a.lineTo('.($target_coords['X'] * $grid_scale).', '.($target_coords['Y'] * $grid_scale).');'."\n"; // target
-	echo 'a.stroke();'."\n";
-	echo 'a.closePath();'."\n";
+if (is_array($conns)) {
+	foreach ($conns as $conn) {
+		$source_coords = getNodeCoords($conn['Source']);
+		$target_coords = getNodeCoords($conn['Target']);
+		echo 'a.beginPath();'."\n";
+		echo 'a.moveTo('.($source_coords['X'] * $grid_scale).', '.($source_coords['Y'] * $grid_scale).');'."\n"; // source
+		echo 'a.lineTo('.($target_coords['X'] * $grid_scale).', '.($target_coords['Y'] * $grid_scale).');'."\n"; // target
+		echo 'a.stroke();'."\n";
+		echo 'a.closePath();'."\n";
+	}
 }
 ?>
 
