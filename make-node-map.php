@@ -42,7 +42,7 @@ $connections = array();
 
 // build the demo nodes
 
-// nodes need these fields: Id, Name, X, Y, Z, ExtraJSONBytes, ExtraJSON
+// nodes need these fields: Id, Name, X, Y, Z, Extra
 $nodes[] = array( 'Id' => 1, 'Name' => 'Node 1', 'X' => 2, 'Y' => 6);
 $nodes[] = array( 'Id' => 2, 'Name' => 'Node 2', 'X' => 3, 'Y' => 3);
 $nodes[] = array( 'Id' => 3, 'Name' => 'Node 3', 'X' => 7, 'Y' => 3);
@@ -61,7 +61,7 @@ $nodes[] = array( 'Id' => 14, 'Name' => 'Node 14', 'X' => 4, 'Y' => 13);
 // give them all the extra zero'd-out stuff
 for ($i = 0; $i < count($nodes); $i++) {
 	$nodes[$i]['Z'] = 0.0;
-	$nodes[$i]['ExtraJSON'] = null;
+	$nodes[$i]['Extra'] = null;
 }
 
 
@@ -124,7 +124,7 @@ for ($i = 0; $i < count($connections); $i++) {
 // give them all the extra zero'd-out stuff
 for ($i = 0; $i < count($connections); $i++) {
 	$connections[$i]['DistanceMultiplier'] = null;
-	$connections[$i]['ExtraJSON'] = null;
+	$connections[$i]['Extra'] = null;
 }
 
 //$thedata['Connections'] = $nodes;

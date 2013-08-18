@@ -30,7 +30,7 @@ type Node struct {
 	X int
 	Y int
 	Z int
-	ExtraJSON map[string]string
+	Extra map[string]string
 }
 
 type Connection struct {
@@ -40,7 +40,7 @@ type Connection struct {
 	Target int
 	Distance float64
 	DistanceMultiplier float64
-	ExtraJSON map[string]string
+	Extra map[string]string
 }
 
 type PathStep struct {
@@ -250,22 +250,6 @@ func (serv GraphService) GetNodeHandler(Id int) (n Node){
 	
 	fmt.Printf("Giving: %+v \n", n)
 	
-	/*
-	n.Id = Id
-	n.Name = "Some Node"
-	n.ExtraJSONBytes = []byte(`[{"Name": "Platypus", "Order": "Monotremata"}]`)
-	// this technique of taking arbitrary JSON and turning it into something usable came from: http://blog.golang.org/json-and-go
-	var tmp interface {}
-	err := json.Unmarshal(n.ExtraJSONBytes, &tmp)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	//fmt.Printf("JSON: %T %+v \n", tmp, tmp)
-	n.ExtraJSON = tmp.([]interface{})
-	n.ExtraJSONBytes = nil
-	*/
-	
-	// could not find it! send 404
     return
 }
 
