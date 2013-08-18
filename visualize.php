@@ -89,9 +89,9 @@ $actual_grid_height = $grid_height * $grid_scale;
 <head>
 <title>Visualize the Graph</title>
 </head>
-<body>
+<body style="margin:0;padding:0;">
 
-<h1>SIGIL Visualization</h1>
+<!-- ><h1>SIGIL Visualization</h1> -->
 
 <div>
 <canvas id="graph" style="background-color:#fff;" width="<?php echo $actual_grid_width; ?>px" height="<?php echo $actual_grid_height; ?>px"></canvas>
@@ -143,7 +143,12 @@ if (is_array($conns)) {
 foreach ($nodes as $node) {
 	echo 'a.beginPath();'."\n";
 	echo 'a.arc('.($node['X'] * $grid_scale).', '.($node['Y'] * $grid_scale).', 5, 0, 2 * Math.PI, false);'."\n";
-	echo 'a.fillStyle = "#aaa";'."\n"; // fill of the node itself
+	if (isset($node['Extra']) && isset($node['Extra']['color'])) {
+		$fill_color = $node['Extra']['color'];
+	} else {
+		$fill_color = '#aaa';
+	}
+	echo 'a.fillStyle = "'.$fill_color.'";'."\n"; // fill of the node itself
 	echo 'a.fill();'."\n";
 	echo 'a.closePath();'."\n";
 	echo 'a.fillStyle = "#ccc";'."\n";
