@@ -103,6 +103,12 @@ query actions:
 	- options for either "get all paths" or "get shortest path"
 - get all nodes connected to node
 	- list of nodes and connections they're based on
+- get all nodes within X connections
+	- i.e. "get all nodes within 3 hops of current node"
+	- returns list of nodes and connections they're based on
+- get all nodes X connections away
+	- i.e. "get all nodes that are exactly 3 hops away from the current node"
+	- returns list of nodes and connections they're based on
 
 backend stuff:
 
